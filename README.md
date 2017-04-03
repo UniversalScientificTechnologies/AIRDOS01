@@ -2,7 +2,7 @@
 
 Cosmic radiation dosimeter unit. It is intended for airborne measurement of cosmic radiation and dosimetry in mixed ionization fields on board of aircraft. 
 
-<img src="https://raw.githubusercontent.com/MLAB-project/Modules/master/AVR/AT32TQ14401A/DOC/SRC/img/AT32TQ14401A_Big.png" width="600" />
+<img src="https://raw.githubusercontent.com/UniversalScientificTechnologies/AIRDOS/master/DOC/src/img/AIRDOS01A_box.JPG" width="800" />
 
 Technical parameters are following: 
 
