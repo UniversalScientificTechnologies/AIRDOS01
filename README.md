@@ -13,4 +13,5 @@ Technical parameters are following:
 * Dead time between measurements   1:5
 * Measurement period    10 s (every 5 minutes an 29 seconds long gab for position measurement and data logging)
 
+[Purchase](http://www.ust.cz/shop/product_info.php?&products_id=269)
 
