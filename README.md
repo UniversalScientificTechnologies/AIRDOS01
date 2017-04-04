@@ -15,6 +15,9 @@ Technical parameters are following:
 
 [Purchase](http://www.ust.cz/shop/product_info.php?&products_id=269)
 
+Block diagram
+<img src="https://raw.githubusercontent.com/UniversalScientificTechnologies/AIRDOS/master/SCH_PCB/AIRDOS01A_block.jpeg" width="800" />
+
+Schema CANDY
 <img src="https://raw.githubusercontent.com/UniversalScientificTechnologies/AIRDOS/master/SCH_PCB/CANDY/CANDY01A/CANDY01A_SCH.jpg" width="800" />
 
-<img src="https://raw.githubusercontent.com/UniversalScientificTechnologies/AIRDOS/master/SCH_PCB/AIRDOS01A_block.jpeg" width="800" />
