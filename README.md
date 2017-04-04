@@ -17,4 +17,4 @@ Technical parameters are following:
 
 <img src="https://raw.githubusercontent.com/UniversalScientificTechnologies/AIRDOS/master/SCH_PCB/CANDY/CANDY01A/CANDY01A_SCH.jpg" width="800" />
 
-<img src="https://raw.githubusercontent.com/UniversalScientificTechnologies/AIRDOS/master/SCH_PCB/AIRDOS01A.jpeg" width="800" />
+<img src="https://raw.githubusercontent.com/UniversalScientificTechnologies/AIRDOS/master/SCH_PCB/AIRDOS01A_block.jpeg" width="800" />
