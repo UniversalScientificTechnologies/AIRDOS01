@@ -10,8 +10,8 @@ Technical parameters are following:
 * Number of erengy channels    500
 * Energy measurement resolution    <81 keV/channel
 * Position logging interval    5 minutes
-* Dead time between measurements   1:5
-* Measurement period    10 s (every 5 minutes an 29 seconds long gab for position measurement and data logging)
+* Dead time ratio during measurement   1:5
+* Periodicity of measurements    13 s (every 5 minutes an 29 seconds long gab for position measurement and data logging)
 
 [Purchase](http://www.ust.cz/shop/product_info.php?&products_id=269)
 
