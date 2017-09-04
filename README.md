@@ -1,4 +1,4 @@
-# Ariborne dosimeter device - AIRDOS
+# Airborne dosimeter device - AIRDOS
 
 Cosmic radiation dosimeter unit. It is intended for airborne measurement of cosmic radiation and dosimetry in mixed ionization fields on board of aircraft. 
 
@@ -6,12 +6,11 @@ Cosmic radiation dosimeter unit. It is intended for airborne measurement of cosm
 
 Technical parameters are following: 
 
-* Measurement time 30 days
-* Number of erengy channels    500
-* Energy measurement resolution    <81 keV/channel
-* Position logging interval    5 minutes
-* Dead time ratio during measurement   1:5
-* Periodicity of measurements    13 s (every 5 minutes an 29 seconds long gab for position measurement and data logging)
+* Measurement endurance 32 days
+* Number of erengy channels    252
+* Energy measurement resolution    <30 keV/channel
+* GPS logging interval    5 minutes fix
+* Integration time    8 s (There is a 30 seconds long dellay every 5 minutes for obtaining a GPS fix.)
 
 [Purchase](http://www.ust.cz/shop/product_info.php?&products_id=269)
 
