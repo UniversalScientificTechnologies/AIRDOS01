@@ -11,7 +11,7 @@ Technical parameters are following:
 * Energy measurement resolution    <30 keV/channel
 * GPS logging interval    5 minutes
 * Time to GPS fix	26 s
-* Integration time    8 s (There is a 30 seconds long dellay every 5 minutes for obtaining a GPS fix.)
+* Integration time    8 s
 
 [Purchase](http://www.ust.cz/shop/product_info.php?&products_id=269)
 
