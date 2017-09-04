@@ -9,7 +9,8 @@ Technical parameters are following:
 * Measurement endurance 32 days
 * Number of erengy channels    252
 * Energy measurement resolution    <30 keV/channel
-* GPS logging interval    5 minutes fix
+* GPS logging interval    5 minutes
+* Time to GPS fix	26 s
 * Integration time    8 s (There is a 30 seconds long dellay every 5 minutes for obtaining a GPS fix.)
 
 [Purchase](http://www.ust.cz/shop/product_info.php?&products_id=269)
