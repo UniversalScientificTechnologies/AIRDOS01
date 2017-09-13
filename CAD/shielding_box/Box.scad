@@ -9,7 +9,7 @@ drat = 1.5;  // Průměr/výška otvoru na dráty
 
 okraj = 2;  // šířka horního okraje
 
-clear = 0.175;      // K otvoru na matičku
+clear = 0.4;      // K otvoru na matičku
 nut_size = 6.6;     // K otvoru na matičku
 
 MLAB_grid = 10.16;
@@ -59,7 +59,7 @@ module konstrukce1()
      translate([0, 0, h/2])
       cylinder(h, d/2, d/2, center = true);
       
-      //Vedlejší příčky - ve směru x
+ /*     //Vedlejší příčky - ve směru x
       for(i = [1:a]) {
      translate([(MLAB_grid*(b-1))/2+ot ,o + MLAB_grid*(i-1),-d/4+roh/2])
       roundcube([MLAB_grid*(b-1)+2*ot,d-2*roh,(d-2*roh)/2],corner = roh);
@@ -83,7 +83,7 @@ module konstrukce1()
       cylinder(h, d/2, d/2, center = true);
       }
       
-      
+  */    
  // ZAOBLENI ROHU    
   hull() {
 difference() {
@@ -115,10 +115,10 @@ translate([ot-MLAB_grid, o,h-1.5]) {
     difference() {  
         hull() {
         translate([0,-3/7*MLAB_grid,0])
-            cube([MLAB_grid-ot,2*3/7*MLAB_grid,1.5]);
+            cube([MLAB_grid-ot-0.2,2*3/7*MLAB_grid,1.5]);
             cylinder(1.5, 3/7*MLAB_grid, 3/7*MLAB_grid);
-        translate([MLAB_grid-ot-d/2, -3.5, -3*h/4])
-            cube([c, 2*3.5, 1.5]);
+        translate([MLAB_grid-ot-c, -3/7*MLAB_grid, -3*h/4])
+            cube([c-0.2, 2*3/7*MLAB_grid, 1.5]);
         }
     translate([0,0,1.5/2+0.4])   
     cylinder(3, 3.5/2, 3.5/2, center = true);
