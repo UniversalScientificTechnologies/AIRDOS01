@@ -96,7 +96,7 @@ eh=0.25;   // extrusion height
 //
 //////////////////////////////////////////////////////////////////////////////////
 module flexbatter(
-  n=1,             // number of compartments side by side
+  n=3,             // number of compartments side by side
   m=1,             // number of cells in one compartment
   l=61,            // length of cell
   d=34,            // diameter of cell
