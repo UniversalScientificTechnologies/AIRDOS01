@@ -1,5 +1,5 @@
-use <SRC/flexbatter.scad>
-use <SRC/AIRDOS_batter.scad>
+use <src/flexbatter.scad>
+use <src/AIRDOS_batter.scad>
 
 include <configuration.scad>
 
