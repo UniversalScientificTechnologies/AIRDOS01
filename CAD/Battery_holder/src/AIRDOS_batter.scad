@@ -106,7 +106,7 @@ module SLOUPEK_bocnice(delka_bocnice)
        
          //krychle
          translate([-(sirka_matky/2+sila_materialu/2),0,0]) 
-         cube([2*(sirka_matky/2+sila_materialu/2),delka_bocnice,vyska_sloupku],center=false); 
+         cube([2*(sirka_matky/2+sila_materialu/2),delka_bocnice,vyska_sloupku-5.5],center=false); 
      
           cylinder (h = vyska_sloupku, r= sirka_matky/2+sila_materialu/2, $fn=20);
          
