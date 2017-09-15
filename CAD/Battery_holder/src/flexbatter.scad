@@ -106,7 +106,7 @@ module flexbatter(
   hf=0.75,         // relative hight of cell (1=full diameter)
   shd=3,           // screw hole diameter
   eps=0.28,        // extra diameter space 
-  oh=0,            // overhang to avoid lifting of cell
+  oh=2,            // overhang to avoid lifting of cell
   el=0,            // extra spring length (needed for small cells)
   xchan=[1/4,3/4], // relative position of traversal wire channels
   deepen=0,        // relative deepening for side grip of batteries 
