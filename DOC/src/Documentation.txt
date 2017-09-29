@@ -1,0 +1,11 @@
+Dozimer lze provozovat s počtem bateriových článků od 1 do 3.  Obvyklým limitem jsou dva články díky omezením letecké přepravy. 
+
+V případě použití více než jednoho článku je potřebné aby všechny použité bateriové články byly stejně vybité. Neboť jinak hrozí zvýšené samovybíjení v důsledku vyrovnávání potenciálů mezi články. 
+
+
+
+Testování: 
+
+Žlutá LED na AIRDOS bliká po každém měřícím intevrvalu.  V případě, že je detekována zvýšená intenzita ionizujícího záření, tak LED blikne dvakrát. 
+
+Zelená LED bliká pokaždé když GPS získá Fix. 
