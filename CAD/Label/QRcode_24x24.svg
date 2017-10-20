@@ -16,7 +16,7 @@
    version="1.1"
    id="svg2"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="QRcode_24mmTape.svg">
+   sodipodi:docname="QRcode_24x24.svg">
   <metadata
      id="metadata1102">
     <rdf:RDF>
@@ -40,15 +40,15 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1855"
-     inkscape:window-height="1056"
+     inkscape:window-width="1015"
+     inkscape:window-height="1896"
      id="namedview1098"
      showgrid="false"
      borderlayer="true"
      inkscape:showpageshadow="false"
-     inkscape:zoom="11.789192"
-     inkscape:cx="46.349341"
-     inkscape:cy="46.695382"
+     inkscape:zoom="5.894596"
+     inkscape:cx="46.88595"
+     inkscape:cy="8.217984"
      inkscape:window-x="65"
      inkscape:window-y="24"
      inkscape:window-maximized="1"
@@ -56,7 +56,7 @@
      units="mm" />
   <g
      id="Pattern"
-     transform="matrix(0.12596006,0,0,0.12596006,-0.31490014,-0.31490014)">
+     transform="matrix(0.10305823,0,0,0.10305823,0.15458737,0.15458737)">
     <rect
        style="fill:#000000"
        id="rect8"
