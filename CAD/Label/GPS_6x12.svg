@@ -9,13 +9,13 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="58mm"
-   height="12mm"
-   viewBox="0 0 205.51181 42.519684"
+   width="11.781851mm"
+   height="6mm"
+   viewBox="0 0 41.746715 21.259842"
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="DeviceName_12mmTape.svg">
+   sodipodi:docname="GPS_6x12.svg">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -26,16 +26,16 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8"
-     inkscape:cx="173.75877"
-     inkscape:cy="0.1937325"
+     inkscape:cx="-2.3279399"
+     inkscape:cy="-10.436247"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      height="24mm"
-     inkscape:window-width="1855"
+     inkscape:window-width="1920"
      inkscape:window-height="1056"
-     inkscape:window-x="65"
-     inkscape:window-y="24"
+     inkscape:window-x="3000"
+     inkscape:window-y="864"
      inkscape:window-maximized="1"
      fit-margin-left="1"
      fit-margin-top="1"
@@ -57,18 +57,18 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-6.0624071,-1006.0486)">
+     transform="translate(-8.2205453,-1016.6785)">
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:34.07026291px;line-height:125%;font-family:'PT Sans Caption';-inkscape-font-specification:'PT Sans Caption, Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="14.396572"
-       y="1039.233"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:19.46871948px;line-height:125%;font-family:'PT Sans Caption';-inkscape-font-specification:'PT Sans Caption, Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="10.985104"
+       y="1034.1224"
        id="text3336"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3338"
-         x="14.396572"
-         y="1039.233"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:34.07026291px;line-height:125%;font-family:'PT Sans Caption';-inkscape-font-specification:'PT Sans Caption, Bold';text-align:start;writing-mode:lr-tb;text-anchor:start">AIRDOS01A</tspan></text>
+         x="10.985104"
+         y="1034.1224"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:19.46871948px;line-height:125%;font-family:'PT Sans Caption';-inkscape-font-specification:'PT Sans Caption, Bold';text-align:start;writing-mode:lr-tb;text-anchor:start">GPS</tspan></text>
   </g>
 </svg>

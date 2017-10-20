@@ -11,13 +11,13 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="25mm"
-   height="12mm"
-   viewBox="0 0 88.582675 42.519684"
+   width="23.67754mm"
+   height="6mm"
+   viewBox="0 0 83.896793 21.259842"
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="SerialNumber_12mmTape_Bold.svg">
+   sodipodi:docname="A001_6x24.svg">
   <defs
      id="defs4">
     <linearGradient
@@ -91,9 +91,9 @@
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient4173"
-       id="linearGradient3385"
+       id="linearGradient3348"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.48805886,0,0,0.48805886,8.6218474,522.72481)"
+       gradientTransform="matrix(0.48671435,0,0,0.48671435,8.635838,524.12561)"
        x1="9.6057158"
        y1="1027.3085"
        x2="231.71884"
@@ -107,8 +107,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="205.85677"
-     inkscape:cy="34.430237"
+     inkscape:cx="29.433456"
+     inkscape:cy="23.819878"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -138,18 +138,18 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-7.6624088,-1002.8521)">
+     transform="translate(-10.157152,-1013.5016)">
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:bold;font-size:19.52250004px;line-height:125%;font-family:'PT Sans Caption';letter-spacing:0px;word-spacing:0px;fill:url(#linearGradient3385);fill-opacity:1;stroke:none;stroke-width:0.20000002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;-inkscape-font-specification:'PT Sans Caption, Bold';font-stretch:normal;font-variant:normal;text-anchor:start;text-align:start;writing-mode:lr;"
-       x="13.153825"
-       y="1030.9448"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:19.46871948px;line-height:125%;font-family:'PT Sans Caption';-inkscape-font-specification:'PT Sans Caption, Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient3348);fill-opacity:1;stroke:none;stroke-width:0.20000002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="13.155331"
+       y="1030.9456"
        id="text3336"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
-         x="13.153825"
-         y="1030.9448"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:19.52250004px;line-height:125%;font-family:'PT Sans Caption';-inkscape-font-specification:'PT Sans Caption, Bold';text-align:start;writing-mode:lr;text-anchor:start;fill:url(#linearGradient3385);fill-opacity:1;stroke-width:0.20000002;stroke-miterlimit:4;stroke-dasharray:none;"
+         x="13.155331"
+         y="1030.9456"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:19.46871948px;line-height:125%;font-family:'PT Sans Caption';-inkscape-font-specification:'PT Sans Caption, Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient3348);fill-opacity:1;stroke-width:0.20000002;stroke-miterlimit:4;stroke-dasharray:none"
          id="tspan4179">SN:A001</tspan></text>
   </g>
 </svg>
