@@ -6,6 +6,7 @@ Cosmic radiation dosimeter unit. It is intended for airborne measurement of cosm
 
 Technical parameters are following: 
 
+* Silicon PIN diode detector with 60mm³ detection volume
 * Measurement endurance 32 days
 * Number of erengy channels    252
 * Energy measurement resolution    <30 keV/channel
@@ -15,9 +16,9 @@ Technical parameters are following:
 
 [Purchase](http://www.ust.cz/shop/product_info.php?&products_id=269)
 
-Block diagram
+Device block diagram
 <img src="https://raw.githubusercontent.com/UniversalScientificTechnologies/AIRDOS/master/SCH_PCB/AIRDOS01A_block.png" width="800" />
 
-Schema CANDY
+CANDY detector schematics
 <img src="https://raw.githubusercontent.com/UniversalScientificTechnologies/AIRDOS/master/SCH_PCB/CANDY/CANDY01A/CANDY_Detector_Schematics.png" width="800" />
 
