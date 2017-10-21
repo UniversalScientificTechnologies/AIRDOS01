@@ -20,4 +20,4 @@ Device block diagram
 CANDY detector schematics
 <img src="https://raw.githubusercontent.com/UniversalScientificTechnologies/AIRDOS/master/SCH_PCB/CANDY/CANDY01A/CANDY_Detector_Schematics.png" width="800" />
 
-The device can be [purchased from Universal Scientific Technologies s.r.o](http://www.ust.cz/shop /product_info.php?&products_id=269) online store. 
+The device can be [purchased from Universal Scientific Technologies s.r.o](http://www.ust.cz/shop/product_info.php?&products_id=269) online store. 
