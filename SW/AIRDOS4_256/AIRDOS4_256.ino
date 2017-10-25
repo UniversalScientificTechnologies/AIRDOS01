@@ -148,6 +148,15 @@ void setup()
   digitalWrite(RELE_OFF, HIGH);  
   delay(500);
   digitalWrite(RELE_OFF, LOW);
+
+
+  for(int i=0; i<20; i++)  
+  {
+    delay(50);
+    digitalWrite(LED_yellow, LOW);  // Blink for Dasa 
+    delay(50);
+    digitalWrite(LED_yellow, HIGH);  
+  }
 }
 
 #define MEASUREMENTS  25   // cca 5 minutes of radiation measurement
