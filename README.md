@@ -2,7 +2,9 @@
 
 Cosmic radiation dosimeter unit. It is intended for airborne measurement of cosmic radiation and dosimetry in mixed ionization fields on board of aircraft. 
 
-<img src="https://raw.githubusercontent.com/UniversalScientificTechnologies/AIRDOS/master/DOC/src/img/AIRDOS01A_box.JPG" width="800" />
+<img src="https://raw.githubusercontent.com/UniversalScientificTechnologies/AIRDOS/master/DOC/src/img/AIRDOS01A_box_front.JPG" width="800" />
+<img src="https://raw.githubusercontent.com/UniversalScientificTechnologies/AIRDOS/master/DOC/src/img/AIRDOS01A_box_back.JPG" width="800" />
+
 
 Technical parameters are following: 
 
@@ -13,6 +15,7 @@ Technical parameters are following:
 * GPS logging interval    5 minutes
 * Time to GPS fix	26 s
 * Integration time    8 s
+* Weight 1.225 kg (Without batteries and GPS antenna)
 
 Device block diagram
 <img src="https://raw.githubusercontent.com/UniversalScientificTechnologies/AIRDOS/master/SCH_PCB/AIRDOS01A_block.png" width="800" />
