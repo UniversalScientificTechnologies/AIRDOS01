@@ -3,7 +3,7 @@
   (general
     (links 120)
     (no_connects 0)
-    (area 126.56552 78.149285 183.514001 128.475001)
+    (area 127.178999 79.757199 167.461001 120.039201)
     (thickness 1.6)
     (drawings 49)
     (tracks 401)
@@ -14,14 +14,14 @@
 
   (page A4)
   (layers
-    (0 F.Cu signal)
-    (31 B.Cu signal)
-    (32 B.Adhes user)
+    (0 F.Cu signal hide)
+    (31 B.Cu signal hide)
+    (32 B.Adhes user hide)
     (33 F.Adhes user hide)
-    (34 B.Paste user)
-    (35 F.Paste user)
+    (34 B.Paste user hide)
+    (35 F.Paste user hide)
     (36 B.SilkS user)
-    (37 F.SilkS user)
+    (37 F.SilkS user hide)
     (38 B.Mask user)
     (39 F.Mask user)
     (40 Dwgs.User user)
@@ -212,15 +212,15 @@
     )
   )
 
-  (module Mlab_IO:SO-8 (layer B.Cu) (tedit 58E26FE2) (tstamp 578F52E9)
+  (module Mlab_IO:SO-8 (layer B.Cu) (tedit 5A267010) (tstamp 578F52E9)
     (at 147.32 99.9 90)
     (descr "SO-8 Surface Mount Small Outline 150mil 8pin Package")
     (tags "Power Integrations D Package")
     (path /5745F41A)
-    (fp_text reference U1 (at 0 0 90) (layer B.SilkS) hide
+    (fp_text reference U1 (at 0 0 90) (layer B.SilkS)
       (effects (font (thickness 0.3048)) (justify mirror))
     )
-    (fp_text value OZ (at 0 0 90) (layer B.SilkS) hide
+    (fp_text value OPA2314 (at 0 0 90) (layer B.SilkS) hide
       (effects (font (thickness 0.3048)) (justify mirror))
     )
     (fp_circle (center -1.905 -0.762) (end -1.778 -0.762) (layer B.SilkS) (width 0.15))
@@ -441,7 +441,7 @@
     (fp_text reference Di2 (at 4.318 0 180) (layer B.SilkS)
       (effects (font (size 1 1) (thickness 0.25)) (justify mirror))
     )
-    (fp_text value M4 (at 0 -3.81 270) (layer B.SilkS) hide
+    (fp_text value - (at 0 -3.81 270) (layer B.SilkS) hide
       (effects (font (thickness 0.3048)) (justify mirror))
     )
     (fp_text user A (at -3.29946 -1.6002 270) (layer B.SilkS) hide
@@ -546,7 +546,7 @@
     (fp_text reference Con2 (at 0.0127 -0.0381 270) (layer B.SilkS)
       (effects (font (size 0.8 0.8) (thickness 0.2)) (justify mirror))
     )
-    (fp_text value 47u (at -0.09906 -3.59918) (layer B.SilkS) hide
+    (fp_text value - (at -0.09906 -3.59918) (layer B.SilkS) hide
       (effects (font (thickness 0.3048)) (justify mirror))
     )
     (fp_line (start -4.30022 1.69926) (end -4.30022 -1.69926) (layer B.SilkS) (width 0.15))
@@ -566,7 +566,7 @@
     )
   )
 
-  (module sot23-6:TantalC_SizeC_Reflow (layer B.Cu) (tedit 58E25A3C) (tstamp 5798E77D)
+  (module sot23-6:TantalC_SizeC_Reflow (layer B.Cu) (tedit 5A26707A) (tstamp 5798E77D)
     (at 152.4 108.536)
     (descr "Tantal Cap. , Size C, EIA-6032, Reflow,")
     (tags "Tantal Cap. , Size C, EIA-6032, Reflow,")
@@ -575,7 +575,7 @@
     (fp_text reference Con3 (at 0.0127 -0.0381 270) (layer B.SilkS)
       (effects (font (size 0.8 0.8) (thickness 0.2)) (justify mirror))
     )
-    (fp_text value 47u (at -0.09906 -3.59918) (layer B.SilkS) hide
+    (fp_text value 47u (at 0.254 -0.332) (layer B.SilkS) hide
       (effects (font (thickness 0.3048)) (justify mirror))
     )
     (fp_line (start -4.30022 1.69926) (end -4.30022 -1.69926) (layer B.SilkS) (width 0.15))
@@ -604,7 +604,7 @@
     (fp_text reference Con4 (at 0.0127 -0.0381 270) (layer B.SilkS)
       (effects (font (size 0.8 0.8) (thickness 0.2)) (justify mirror))
     )
-    (fp_text value 47u (at -0.09906 -3.59918) (layer B.SilkS) hide
+    (fp_text value - (at -0.09906 -3.59918) (layer B.SilkS) hide
       (effects (font (thickness 0.3048)) (justify mirror))
     )
     (fp_line (start -4.30022 1.69926) (end -4.30022 -1.69926) (layer B.SilkS) (width 0.15))
@@ -681,13 +681,13 @@
     )
   )
 
-  (module Mlab_IO:SOT-23-6 (layer B.Cu) (tedit 58DE96E4) (tstamp 58DE9575)
+  (module Mlab_IO:SOT-23-6 (layer B.Cu) (tedit 5A266FC5) (tstamp 58DE9575)
     (at 147.193 90.756 90)
     (path /581264C2)
-    (fp_text reference U2 (at 1.99898 0) (layer B.SilkS) hide
+    (fp_text reference U2 (at 1.99898 0) (layer B.SilkS)
       (effects (font (size 0.762 0.762) (thickness 0.0762)) (justify mirror))
     )
-    (fp_text value sot23-6 (at 0.0635 0 90) (layer B.SilkS) hide
+    (fp_text value BSS138 (at 0.0635 0 90) (layer B.SilkS) hide
       (effects (font (size 0.50038 0.50038) (thickness 0.0762)) (justify mirror))
     )
     (fp_line (start -0.508 -0.762) (end -1.27 -0.254) (layer B.SilkS) (width 0.15))
@@ -714,14 +714,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E26F68) (tstamp 58E25AB7)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A2670B6) (tstamp 58E25AB7)
     (at 135.89 104.345 270)
     (path /574854BB)
     (attr smd)
-    (fp_text reference A1 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference A1 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value C (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value 1N4148 (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -742,14 +742,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E26F70) (tstamp 58E25AC3)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A2670AD) (tstamp 58E25AC3)
     (at 138.43 104.345 90)
     (path /5745FD2A)
     (attr smd)
-    (fp_text reference A2 (at 0 0.3175 90) (layer B.SilkS) hide
+    (fp_text reference A2 (at 0 0.3175 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 90) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -770,14 +770,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E26F82) (tstamp 58E25ACF)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A2670A8) (tstamp 58E25ACF)
     (at 140.97 104.345 90)
     (path /574D5CE9)
     (attr smd)
-    (fp_text reference A3 (at 0 0.3175 90) (layer B.SilkS) hide
+    (fp_text reference A3 (at 0 0.3175 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value C (at 0.127 -0.381 90) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -798,14 +798,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E26F8A) (tstamp 58E25ADB)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A2670A2) (tstamp 58E25ADB)
     (at 143.51 104.345 270)
     (path /5745FDE3)
     (attr smd)
-    (fp_text reference A4 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference A4 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -826,14 +826,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E26F93) (tstamp 58E25AE7)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A267097) (tstamp 58E25AE7)
     (at 146.05 104.345 270)
     (path /574882F0)
     (attr smd)
-    (fp_text reference A5 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference A5 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value C (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -854,14 +854,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E26F9B) (tstamp 58E25AF3)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A26708F) (tstamp 58E25AF3)
     (at 148.59 104.345 270)
     (path /575DCD53)
     (attr smd)
-    (fp_text reference A6 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference A6 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value 100nF (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value 100nF (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -882,14 +882,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E26FA3) (tstamp 58E25AFF)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A267087) (tstamp 58E25AFF)
     (at 151.13 104.345 90)
     (path /574D6C58)
     (attr smd)
-    (fp_text reference A7 (at 0 0.3175 90) (layer B.SilkS) hide
+    (fp_text reference A7 (at 0 0.3175 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value C (at 0.127 -0.381 90) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -910,14 +910,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E26FAC) (tstamp 58E25B0B)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A267083) (tstamp 58E25B0B)
     (at 153.67 104.345 270)
     (path /574D6C22)
     (attr smd)
-    (fp_text reference A8 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference A8 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -938,14 +938,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E26FB6) (tstamp 58E25B17)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A267075) (tstamp 58E25B17)
     (at 156.21 104.345 90)
     (path /574D6C28)
     (attr smd)
-    (fp_text reference A9 (at 0 0.3175 90) (layer B.SilkS) hide
+    (fp_text reference A9 (at 0 0.3175 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 90) (layer B.SilkS) hide
+    (fp_text value 0R (at 0.127 -0.381 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -966,14 +966,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E26FBE) (tstamp 58E25B23)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A26706F) (tstamp 58E25B23)
     (at 158.75 104.345 270)
     (path /574D6C2E)
     (attr smd)
-    (fp_text reference A10 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference A10 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value C (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value 0R (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -994,14 +994,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E27002) (tstamp 58E25B2F)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A267053) (tstamp 58E25B2F)
     (at 135.89 99.9 90)
     (path /5749B98D)
     (attr smd)
-    (fp_text reference B1 (at 0 0.3175 90) (layer B.SilkS) hide
+    (fp_text reference B1 (at 0 0.3175 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value C (at 0.127 -0.381 90) (layer B.SilkS) hide
+    (fp_text value 0R (at 0.127 -0.381 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1022,14 +1022,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E26FF8) (tstamp 58E25B3B)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A26704D) (tstamp 58E25B3B)
     (at 138.43 99.9 90)
     (path /57486CE3)
     (attr smd)
-    (fp_text reference B2 (at 0 0.3175 90) (layer B.SilkS) hide
+    (fp_text reference B2 (at 0 0.3175 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 90) (layer B.SilkS) hide
+    (fp_text value 1kR (at 0.127 -0.381 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1050,14 +1050,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E26FED) (tstamp 58E25B47)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A267047) (tstamp 58E25B47)
     (at 140.97 99.9 90)
     (path /574ED590)
     (attr smd)
-    (fp_text reference B3 (at 0 0.3175 90) (layer B.SilkS) hide
+    (fp_text reference B3 (at 0 0.3175 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 90) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1078,14 +1078,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E26FD4) (tstamp 58E25B53)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A26705E) (tstamp 58E25B53)
     (at 153.67 99.9 270)
     (path /574D6CAA)
     (attr smd)
-    (fp_text reference B8 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference B8 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value C (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1106,14 +1106,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E26FCC) (tstamp 58E25B5F)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A267063) (tstamp 58E25B5F)
     (at 156.21 99.9 90)
     (path /574D6C40)
     (attr smd)
-    (fp_text reference B9 (at 0 0.3175 90) (layer B.SilkS) hide
+    (fp_text reference B9 (at 0 0.3175 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 90) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1134,14 +1134,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E26FC6) (tstamp 58E25B6B)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A267069) (tstamp 58E25B6B)
     (at 158.75 99.9 270)
     (path /574D6CA2)
     (attr smd)
-    (fp_text reference B10 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference B10 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value C (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1162,14 +1162,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E2700B) (tstamp 58E25B77)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A267040) (tstamp 58E25B77)
     (at 135.89 95.455 90)
     (path /574D513E)
     (attr smd)
-    (fp_text reference C1 (at 0 0.3175 90) (layer B.SilkS) hide
+    (fp_text reference C1 (at 0 0.3175 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value C (at 0.127 -0.381 90) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1190,14 +1190,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E27013) (tstamp 58E25B83)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A26703A) (tstamp 58E25B83)
     (at 138.43 95.455 90)
     (path /579676DC)
     (attr smd)
-    (fp_text reference C2 (at 0 0.3175 90) (layer B.SilkS) hide
+    (fp_text reference C2 (at 0 0.3175 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value C (at 0.127 -0.381 90) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1218,14 +1218,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E2701A) (tstamp 58E25B8F)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A267034) (tstamp 58E25B8F)
     (at 140.97 95.455 270)
     (path /574ED470)
     (attr smd)
-    (fp_text reference C3 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference C3 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value 0R (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1246,14 +1246,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E27021) (tstamp 58E25B9B)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A26702C) (tstamp 58E25B9B)
     (at 143.51 95.455 270)
     (path /575DD1A4)
     (attr smd)
-    (fp_text reference C4 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference C4 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value 100nF (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value 0R (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1274,14 +1274,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E27029) (tstamp 58E25BA7)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A267026) (tstamp 58E25BA7)
     (at 146.05 95.455 270)
     (path /581229FB)
     (attr smd)
-    (fp_text reference C5 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference C5 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value C (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value 10kR (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1302,14 +1302,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E27037) (tstamp 58E25BB3)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A267000) (tstamp 58E25BB3)
     (at 148.59 95.455 90)
     (path /58122B27)
     (attr smd)
-    (fp_text reference C6 (at 0 0.3175 90) (layer B.SilkS) hide
+    (fp_text reference C6 (at 0 0.3175 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value C (at 0.127 -0.381 90) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1330,14 +1330,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E2703C) (tstamp 58E25BBF)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A266FF7) (tstamp 58E25BBF)
     (at 151.13 95.455 270)
     (path /574EC7FF)
     (attr smd)
-    (fp_text reference C7 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference C7 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value 51R (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1358,14 +1358,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E27046) (tstamp 58E25BCB)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A266FF1) (tstamp 58E25BCB)
     (at 153.67 95.455 90)
     (path /574EC6DF)
     (attr smd)
-    (fp_text reference C8 (at 0 0.3175 90) (layer B.SilkS) hide
+    (fp_text reference C8 (at 0 0.3175 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 90) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1386,14 +1386,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E2704D) (tstamp 58E25BD7)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A266FEB) (tstamp 58E25BD7)
     (at 156.21 95.455 90)
     (path /57966DF4)
     (attr smd)
-    (fp_text reference C9 (at 0 0.3175 90) (layer B.SilkS) hide
+    (fp_text reference C9 (at 0 0.3175 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value C (at 0.127 -0.381 90) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1414,14 +1414,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E27055) (tstamp 58E25BE3)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A266FE6) (tstamp 58E25BE3)
     (at 158.75 95.455 90)
     (path /574D6C6A)
     (attr smd)
-    (fp_text reference C10 (at 0 0.3175 90) (layer B.SilkS) hide
+    (fp_text reference C10 (at 0 0.3175 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value C (at 0.127 -0.381 90) (layer B.SilkS) hide
+    (fp_text value 0R (at 0.127 -0.381 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1442,14 +1442,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E2709B) (tstamp 58E25BEF)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A266FB1) (tstamp 58E25BEF)
     (at 135.89 91.01 270)
     (path /5748662D)
     (attr smd)
-    (fp_text reference D1 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference D1 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1470,14 +1470,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E27094) (tstamp 58E25BFB)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A266FB7) (tstamp 58E25BFB)
     (at 138.43 91.01 90)
     (path /5748583F)
     (attr smd)
-    (fp_text reference D2 (at 0 0.3175 90) (layer B.SilkS) hide
+    (fp_text reference D2 (at 0 0.3175 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 90) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1498,14 +1498,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E2708D) (tstamp 58E25C07)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A266FBC) (tstamp 58E25C07)
     (at 140.97 91.01 90)
     (path /57486783)
     (attr smd)
-    (fp_text reference D3 (at 0 0.3175 90) (layer B.SilkS) hide
+    (fp_text reference D3 (at 0 0.3175 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 90) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 90) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1526,14 +1526,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E27085) (tstamp 58E25C13)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A266FC2) (tstamp 58E25C13)
     (at 143.51 91.01 270)
     (path /58123AD4)
     (attr smd)
-    (fp_text reference D4 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference D4 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1554,14 +1554,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E27079) (tstamp 58E25C1F)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A266FCD) (tstamp 58E25C1F)
     (at 151.13 91.01 270)
     (path /58123CE5)
     (attr smd)
-    (fp_text reference D7 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference D7 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value 0R (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1582,14 +1582,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E27072) (tstamp 58E25C2B)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A266FD4) (tstamp 58E25C2B)
     (at 153.67 91.01 270)
     (path /574D6C46)
     (attr smd)
-    (fp_text reference D8 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference D8 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value 1nF (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1610,14 +1610,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E2706B) (tstamp 58E25C37)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A266FDA) (tstamp 58E25C37)
     (at 156.21 91.01 270)
     (path /574D6C52)
     (attr smd)
-    (fp_text reference D9 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference D9 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value 100R (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1638,14 +1638,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E27063) (tstamp 58E25C43)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A266FDF) (tstamp 58E25C43)
     (at 158.75 91.01 270)
     (path /574D6C34)
     (attr smd)
-    (fp_text reference D10 (at 0 0.3175 270) (layer B.SilkS) hide
+    (fp_text reference D10 (at 0 0.3175 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 270) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 270) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1666,14 +1666,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5900BB5D) (tstamp 58E25C4F)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A2670CD) (tstamp 58E25C4F)
     (at 149.987 111.125 180)
     (path /575DCB8A)
     (attr smd)
     (fp_text reference R1 (at 0 0 180) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 180) (layer B.SilkS) hide
+    (fp_text value 10R (at -0.127 -0.889 180) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1694,14 +1694,14 @@
     )
   )
 
-  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 58E26F30) (tstamp 58E25C5B)
+  (module Mlab_R:SMD-0805-hand-soldering (layer B.Cu) (tedit 5A2670C6) (tstamp 58E25C5B)
     (at 145.415 111.1395 180)
     (path /575DD198)
     (attr smd)
     (fp_text reference R2 (at 0 0 180) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
-    (fp_text value R (at 0.127 -0.381 180) (layer B.SilkS) hide
+    (fp_text value - (at 0.127 -0.381 180) (layer B.SilkS)
       (effects (font (size 0.50038 0.50038) (thickness 0.10922)) (justify mirror))
     )
     (fp_line (start 0.8255 0.8255) (end 1.8415 0.8255) (layer B.SilkS) (width 0.15))
@@ -1723,7 +1723,7 @@
   )
 
   (dimension 40.132 (width 0.3) (layer Dwgs.User)
-    (gr_text "40.132 mm" (at 176.864 99.8982 90) (layer Dwgs.User) (tstamp 5912E526)
+    (gr_text "40.132 mm" (at 176.864 99.8982 90) (layer Dwgs.User) (tstamp 5A266EB2)
       (effects (font (size 1.5 1.5) (thickness 0.3)))
     )
     (feature1 (pts (xy 167.386 79.8322) (xy 178.214 79.8322)))
@@ -1735,7 +1735,7 @@
     (arrow2b (pts (xy 175.514 119.9642) (xy 174.927579 118.837696)))
   )
   (dimension 40.132 (width 0.3) (layer Dwgs.User)
-    (gr_text "40.132 mm" (at 147.32 127.08) (layer Dwgs.User) (tstamp 5912E527)
+    (gr_text "40.132 mm" (at 147.32 127.08) (layer Dwgs.User) (tstamp 5A266EB3)
       (effects (font (size 1.5 1.5) (thickness 0.3)))
     )
     (feature1 (pts (xy 167.386 119.9642) (xy 167.386 128.43)))

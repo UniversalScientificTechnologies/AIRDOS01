@@ -1415,4 +1415,18 @@ Text Notes 11150 4150 3    60   ~ 0
 TO ADC
 Wire Notes Line
 	2400 4750 2400 5350
+Connection ~ 1000 3900
+Connection ~ 2400 4750
+Connection ~ 2700 5600
+Connection ~ 3600 5600
+Connection ~ 8200 4700
+Connection ~ 7650 4000
+Connection ~ 6300 900 
+Connection ~ 6900 900 
+Connection ~ 7600 900 
+Connection ~ 7950 900 
+Connection ~ 7950 1500
+Connection ~ 7600 1500
+Connection ~ 6900 1500
+Connection ~ 9550 4900
 $EndSCHEMATC
