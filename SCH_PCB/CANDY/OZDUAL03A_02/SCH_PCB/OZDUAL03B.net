@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source C:/Chroust/Zaloha/stare/MLAB-project/AIRDOS/SCH_PCB/CANDY/OZDUAL03A_02/SCH_PCB/OZDUAL03B.sch)
-    (date "5. 12. 2017 10:59:57")
+    (date "8. 12. 2017 7:24:23")
     (tool "Eeschema (2017-02-05 revision 431abcf)-makepkg")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -184,7 +184,7 @@
       (sheetpath (names /) (tstamps /))
       (tstamp 574EC6DF))
     (comp (ref C7)
-      (value 51R)
+      (value 1N4148)
       (footprint Mlab_R:SMD-0805-hand-soldering)
       (libsource (lib OZDUAL03B-cache) (part R))
       (sheetpath (names /) (tstamps /))
@@ -304,7 +304,7 @@
       (sheetpath (names /) (tstamps /))
       (tstamp 57A8B6E9))
     (comp (ref C5)
-      (value 10kR)
+      (value 120MR)
       (footprint Mlab_R:SMD-0805-hand-soldering)
       (libsource (lib OZDUAL03B-cache) (part C-RESCUE-OZDUAL03A))
       (sheetpath (names /) (tstamps /))
