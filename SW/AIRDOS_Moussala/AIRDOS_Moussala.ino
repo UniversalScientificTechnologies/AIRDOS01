@@ -244,7 +244,7 @@ void loop()
   
     {
       // make a string for assembling the data to log:
-      String dataString = "$CANDY,";
+      String dataString = "$CANDY1,";
   
       dataString += String(count++); 
       dataString += ",";
