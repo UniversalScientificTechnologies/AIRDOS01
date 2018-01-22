@@ -2,9 +2,9 @@
 
 Cosmic radiation dosimeter unit. It is intended for airborne measurement of cosmic radiation and dosimetry in mixed ionization fields on board of aircraft. 
 
-<img src="https://raw.githubusercontent.com/UniversalScientificTechnologies/AIRDOS/master/DOC/src/img/AIRDOS01A_box_front.JPG" width="800" />
-<img src="https://raw.githubusercontent.com/UniversalScientificTechnologies/AIRDOS/master/DOC/src/img/AIRDOS01A_box_back.JPG" width="800" />
+![AIRDOS01A Front panel with indicating LEDs and GPS antenna connector](/DOC/src/img/AIRDOS01A_box_front.JPG "AIRDOS Front panel")
 
+![AIRDOS01A back panel](/DOC/src/img/AIRDOS01A_box_back.JPG "AIRDOS back panel")
 
 Technical parameters are following: 
 
