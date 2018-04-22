@@ -1,5 +1,6 @@
+// 3 mesice s LS 33600 = 7.6 mA
 /*
-  CANDY based on Mighty 1284p for Laponia
+  CANDY based on Mighty 1284p with RTC
  
 Compiled with: Arduino 1.8.3
 
@@ -255,6 +256,7 @@ void loop()
       String dataString = "$CANDY,";
 
       dataString += String(now.unixtime()); 
+      dataString += ",";
 
       dataString += String(count++); 
       dataString += ",";
