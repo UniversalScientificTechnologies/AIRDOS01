@@ -93,6 +93,30 @@ uint16_t count = 0;
 
 RTC_Millis rtc;
 
+
+uint8_t Lightning_Read(uint8_t addr)
+{
+    // send register number
+    Wire.beginTransmission(_devAddr);
+    Wire.write(addr);
+    Wire.endTransmission(false); // <<<--- THE 'false' here is mandatory!
+
+    // request register data
+    Wire.requestFrom(_devAddr, (uint8_t)1);
+
+    // read data
+    return Wire.read();
+}
+
+void Lightning_Write(uint8_t addr, uint8_t data)
+{
+    Wire.beginTransmission(_devAddr);
+    Wire.write(addr);
+    Wire.write(data);
+    Wire.endTransmission();
+}
+
+
 void setup()
 {
   rtc.begin(DateTime());  // Set RTC to 0 seconds from 1970
@@ -184,7 +208,8 @@ void loop()
     uint16_t maximum = 0;  
     uint16_t supress = 0;      
 
-    for(uint16_t n=0; n<65535; n++) // cca 12 s
+    //!!! for(uint16_t n=0; n<65535; n++) // cca 12 s
+    for(uint16_t n=0; n<65535/12; n++)
     {
       for (int i=0; i<15; i++) {digitalWrite(RESET, LOW);} // whole integration cca 200 us
 
