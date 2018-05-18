@@ -1,7 +1,10 @@
+// AS3935 Lightning Detector Example
+
 #include "wiring_private.h"
 #include <Wire.h>
 
-#define STROKE 8
+#define STROKE 20 // PC4 ATmega 1248
+//!!! #define STROKE 8 // ATmega 328P
 
 void setup()
 {
@@ -22,7 +25,12 @@ void setup()
 /*
   Wire.beginTransmission(3); // transmit to device #44 (0x2c)
   Wire.write(0);             // sends value byte  
-  Wire.write(0b10010);             // sends value byte  
+  Wire.write(0x24);             // sends value byte  
+  Wire.endTransmission();     // stop transmitting
+
+  Wire.beginTransmission(3); // transmit to device #44 (0x2c)
+  Wire.write(1);             // sends value byte  
+  Wire.write(0x22);             // sends value byte  
   Wire.endTransmission();     // stop transmitting
 
   Wire.beginTransmission(3); // transmit to device #44 (0x2c)
