@@ -1,8 +1,8 @@
 // 3 mesice s LS 33600 = 7.6 mA
 /*
-  CANDY based on Mighty 1284p with RTC
+  AIRDOS with RTC
  
-Compiled with: Arduino 1.8.3
+Compiled with: Arduino 1.8.5
 
 ISP
 ---
@@ -17,38 +17,18 @@ CMD    MOSI 5 B5
 DAT0   MISO 6 B6
 CLK    SCK  7 B7
 
-SERIAL 2 (not necessary to connect)
---------
-RX 18 PC2
-TX 19 PC3
-
 ANALOG
 ------
 +      A0  PA0
 -      A1  PA1
 RESET  0   PB0
 
-RELE
-----
-RELE_ON   11    PD3
-RELE_OFF  12    PD4
-
 LED
 ---
-LED_yellow  23  PC7         // LED pro Dasu
-LED_green   TIMEPULSE GPS   // LED pro pilota
-
-The following needs to be added to the line mentioning the atmega644 in
-/usr/share/arduino/libraries/SD/utility/Sd2PinMap.h:
-
-    || defined(__AVR_ATmega1284P__)
-
-so that it reads:
-
-    #elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644__)|| defined(__AVR_ATmega1284P__) 
+LED_yellow  23  PC7         // LED for Dasa
 
 
-    
+                     Mighty 1284p    
                       +---\/---+
            (D 0) PB0 1|        |40 PA0 (AI 0 / D24)
            (D 1) PB1 2|        |39 PA1 (AI 1 / D25)
@@ -73,25 +53,27 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
                       +--------+
 */
 
-#include <SD.h> 
+#include <SD.h>             // Tested with version 1.2.2.
 #include "wiring_private.h"
+#include <Wire.h>           // Tested with version 1.0.0.
+#include "RTClib.h"         // Tested with version 1.5.4.
 
-
-#define MSG_NO 20    // number of logged NMEA messages
-
-#define LED_yellow  23    // PC7
+#define LED_yellow  23 // PC7
+#define RESET     0    // PB0
 #define SDpower1  1    // PB1
 #define SDpower2  2    // PB2
-#define SDpower3  3    // PC3
+#define SDpower3  3    // PB3
+#define SS        4    // PB4
+#define MOSI      5    // PB5
+#define MISO      6    // PB6
+#define SCK       7    // PB7
+#define INT       20   // PC4
 
 #define CHANNELS 512 // number of channels in buffer for histogram, including negative numbers
 
-//SoftwareSerial swSerial(18, 19); // RX, TX
-
-const int chipSelect = 4;
-int RESET = 0;
 uint16_t count = 0;
 
+RTC_Millis rtc;
 
 void setup()
 {
@@ -129,24 +111,34 @@ void setup()
 
   ADMUX = (analog_reference << 6) | ((pin | 0x10) & 0x1F);
   
-  ADCSRB = 0; // Switching ADC to Free Running mode
+  ADCSRB = 0;               // Switching ADC to Free Running mode
+  sbi(ADCSRA, ADATE);       // ADC autotrigger enable (mandatory for free running mode)
+  sbi(ADCSRA, ADSC);        // ADC start the first conversions
+  sbi(ADCSRA, 2);           // 0x100 = clock divided by 16, 62.5 kHz, 208 us for 13 cycles of one AD conversion, 24 us fo 1.5 cycle for sample-hold
+  cbi(ADCSRA, 1);        
+  cbi(ADCSRA, 0);        
 
-  // ADPS = 3 ; 104 us for 13 cycles of one AD conversion, 12 us fo 1.5 cycle for sample-hold
+  pinMode(RESET, OUTPUT);   // reset for peak detetor
 
-  sbi(ADCSRA, ADATE);       // autotrigger enable (mandatory for free running mode)
-  sbi(ADCSRA, ADSC);        // start the first conversions
-
-  Serial.println(ADCSRA,HEX);
-
-  pinMode(RESET, OUTPUT);     
-  pinMode(SDpower1, OUTPUT);     
+  pinMode(INT, INPUT);      // interrupt from lightning detector
+     
+  pinMode(SDpower1, OUTPUT);  // SDcard interface
   pinMode(SDpower2, OUTPUT);     
   pinMode(SDpower3, OUTPUT);     
+  pinMode(SS, OUTPUT);     
+  pinMode(MOSI, INPUT);     
+  pinMode(MISO, INPUT);     
+  pinMode(SCK, OUTPUT);  
+
+  PORTB = 0b00000000;  // SDcard Power OFF
+
   pinMode(LED_yellow, OUTPUT);
   digitalWrite(LED_yellow, HIGH);  
   digitalWrite(RESET, LOW);  
   
-  for(int i=0; i<3; i++)  
+  //!!! Wire.setClock(100000);
+
+  for(int i=0; i<5; i++)  
   {
     delay(50);
     digitalWrite(LED_yellow, LOW);  // Blink for Dasa 
@@ -157,60 +149,60 @@ void setup()
   Serial.println("#Hmmm...");
 }
 
-#define MEASUREMENTS  25  // cca 5 minutes of radiation measurement
 
 void loop()
 {
-  for(int x=0; x<MEASUREMENTS; x++)  
+  uint8_t lo, hi;
+  uint16_t u_sensor, maximum;
+  uint16_t buffer[CHANNELS];
+  
+  for(int n=0; n<CHANNELS; n++)
   {
-    uint8_t lo, hi;
-    uint16_t u_sensor, maximum;
-    uint16_t buffer[CHANNELS];
-    
-    for(int n=0; n<CHANNELS; n++)
-    {
-      buffer[n]=0;
-    }
-    
-    while (bit_is_clear(ADCSRA, ADIF)); // wait for conversion 
-    sbi(ADCSRA, ADIF);                  // reset interrupt flag
-    while (bit_is_clear(ADCSRA, ADIF)); // wait for conversion 
-    digitalWrite(RESET, HIGH);          // Reset peak detector
-    digitalWrite(RESET, LOW); 
-    sbi(ADCSRA, ADIF);                  // reset interrupt flag
+    buffer[n]=0;
+  }
+  
+  while (bit_is_clear(ADCSRA, ADIF)); // wait for conversion 
+  sbi(ADCSRA, ADIF);                  // reset interrupt flag
+  while (bit_is_clear(ADCSRA, ADIF)); // wait for conversion 
+  delayMicroseconds(24);              // wait for 1.5 cycle of 62.5 kHz ADC clock for sample/hold
+  PORTB = 1;                          // Reset peak detector
+  asm("NOP");                         // cca 3 us
+  PORTB = 0;
+  sbi(ADCSRA, ADIF);        // reset interrupt flag from ADC
 
-    uint16_t supress = 0;      
+  uint16_t suppress = 0;      
+  uint8_t stroke_time = 0;      
+  //!!! boolean stroke_detected = false;
 
-    for(uint16_t n=0; n<65535; n++) // cca 12 s
-    //!!! for(uint16_t n=0; n<10000; n++)
+  // dosimeter integration
+  for (uint8_t i=0; i<10; i++)
+  {
+    for (uint16_t n=0; n<4096; n++) // cca 1 s
     {      
-      //    digitalWrite(LED_yellow, LOW);  // Blink for Dasa 
       while (bit_is_clear(ADCSRA, ADIF)); // wait for conversion 
-      delayMicroseconds(12);              // wait for 1.5 cycle of 125 kHz ADC clock for sample/hold
+      delayMicroseconds(24);              // wait for 1.5 cycle of 62.5 kHz ADC clock for sample/hold
       PORTB = 1;                          // Reset peak detector
       asm("NOP");                         // cca 3 us
       PORTB = 0;
-      sbi(ADCSRA, ADIF);        // reset interrupt flag
-      //delayMicroseconds(100);            // integration time
- 
+      sbi(ADCSRA, ADIF);        // reset interrupt flag from ADC
+  
       // we have to read ADCL first; doing so locks both ADCL
       // and ADCH until ADCH is read.  reading ADCL second would
       // cause the results of each conversion to be discarded,
       // as ADCL and ADCH would be locked when it completed.
       lo = ADCL;
       hi = ADCH;
-
+  
       // combine the two bytes
       u_sensor = (hi << 7) | (lo >> 1);
-
+  
       // manage negative values
-      //if (u_sensor <= 511 ) {u_sensor += 512;} else {u_sensor -= 512;}
       if (u_sensor <= (CHANNELS/2)-1 ) {u_sensor += (CHANNELS/2);} else {u_sensor -= (CHANNELS/2);}
                 
-      if (u_sensor > maximum) // suppress double detection for long pulses
+      if (u_sensor > maximum) // filter double detection for pulses between two samples
       {
         maximum = u_sensor;
-        supress++;
+        suppress++;
       }
       else
       {
@@ -219,94 +211,105 @@ void loop()
       }
     }
     
-  
+    stroke_time++;
+    if (digitalRead(INT))
     {
+      break;
+    }
+  }  
+  // Data out
+  {
+    DateTime now = rtc.now();
 
-      // make a string for assembling the data to log:
-      String dataString = "$CANDY,";
+    // make a string for assembling the data to log:
+    String dataString = "$CANDY,";
 
+    dataString += String(count++); 
+    dataString += ",";
+  
+    dataString += String(now.unixtime()); 
+    dataString += ",";
 
-      dataString += String(count++); 
+    for(int n=CHANNELS/2; n<CHANNELS; n++)  
+    {
+      dataString += String(buffer[n]); 
       dataString += ",";
-    
-      for(int n=0; n<CHANNELS; n++)  
-      {
-        dataString += String(buffer[n]); 
+    }
+
+    dataString += String(suppress);
+    dataString += ",";
+
+    dataString += String(stroke_time);
+    dataString += ",";
+
+    {
+      uint32_t stroke, stroke_energy;
+      int lightning[9];
+
+      delay(2); // minimal delay after stroke interrupt
+
+      Wire.requestFrom((uint8_t)3, (uint8_t)9);    // request 9 bytes from slave device #3
+
+      for (int8_t reg=0; reg<9; reg++)
+      { 
+        lightning[reg] = Wire.read();    // receive a byte
+        dataString += String(lightning[reg], HEX); 
         dataString += ",";
       }
-
-      #define NOISE (CHANNELS/2) + 2
-      #define BACKGROUND 7
-        
-      int loDose = 0;
-      for(int n=NOISE; n<(NOISE+BACKGROUND); n++)
-      {
-        loDose += buffer[n];
-      }
+  
+      stroke_energy = lightning[4];
+      stroke = lightning[5];
+      stroke_energy += stroke << 8;
+      stroke = lightning[6] & 0b11111;
+      stroke_energy += stroke << 16;
+  
+      dataString += String(stroke_energy);  // Energy of single stroke
+      dataString += ",";
     
-      int hiDose=0;
-      for(int n=(NOISE+BACKGROUND); n<CHANNELS ; n++)
+      dataString += String(lightning[7] & 0b111111);  // Distance from storm
+    }
+  
+
+    {
+
+      PORTB = 0b00001110;  // SDcard Power ON
+      pinMode(MOSI, OUTPUT);     
+
+      // make sure that the default chip select pin is set to output
+      // see if the card is present and can be initialized:
+      if (!SD.begin(SS)) 
       {
-        hiDose += buffer[n];
-      }
-      
-      int noisenoise=0;
-      for(int n=0; n<NOISE ; n++)
-      {
-        noisenoise += buffer[n];
+        Serial.println("#Card failed, or not present");
+        // don't do anything more:
+        return;
       }
 
-      int dose = loDose+hiDose;
-      dataString += String(dose) + "," + String(loDose) + "," + String(hiDose) + "," + String(noisenoise) + "," + String(supress) + "," + String(dose+noisenoise+supress);
+      // open the file. note that only one file can be open at a time,
+      // so you have to close this one before opening another.
+      File dataFile = SD.open("datalog.txt", FILE_WRITE);
     
+      // if the file is available, write to it:
+      if (dataFile) 
       {
-        //PORTB = 0b00001110;  // SDcard Power ON
-  
-        Serial.print("#Initializing SD card...");
-        // make sure that the default chip select pin is set to
-        // output, even if you don't use it:
-        pinMode(10, OUTPUT);
+        dataFile.println(dataString);  // write to SDcard
         
-        // see if the card is present and can be initialized:
-        if (!SD.begin(chipSelect)) 
-        {
-          Serial.println("#Card failed, or not present");
-          // don't do anything more:
-          return;
-        }
-        Serial.println("#card initialized.");
+        digitalWrite(LED_yellow, LOW);  // Blink for Dasa
+        
+        dataFile.close();
+      }  
+      // if the file isn't open, pop up an error:
+      else 
+      {
+        Serial.println("#error opening datalog.txt");
+      }
 
-        Serial.println(PORTB, HEX);
-  
-  
-        // open the file. note that only one file can be open at a time,
-        // so you have to close this one before opening another.
-        File dataFile = SD.open("datalog.txt", FILE_WRITE);
-      
-        // if the file is available, write to it:
-        if (dataFile) 
-        {
-          dataFile.println(dataString);  // write to SDcard
-          Serial.println(dataString);  // print to terminal
-          
-          digitalWrite(LED_yellow, LOW);  // Blink for Dasa
-          delay(10);
-          digitalWrite(LED_yellow, HIGH);  
-          
-          dataFile.close();
-        }  
-        // if the file isn't open, pop up an error:
-        else 
-        {
-          Serial.println("#error opening datalog.txt");
-        }
-        Serial.println(PORTB, HEX);
-  
-        //PORTB = 0b00000000;  // SDcard Power OFF
-      }      
+      pinMode(MOSI, INPUT);      
+      PORTB = 0b00000000;  // SDcard Power OFF
     }  
+        
+    Serial.println(dataString);  // print to terminal
+    digitalWrite(LED_yellow, HIGH);  
   }    
-  
 }
 
 

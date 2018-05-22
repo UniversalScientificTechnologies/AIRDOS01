@@ -3,8 +3,8 @@
 #include "wiring_private.h"
 #include <Wire.h>
 
-#define STROKE 20 // PC4 ATmega 1248
-//!!! #define STROKE 8 // ATmega 328P
+#define INT 20 // PC4 ATmega 1248
+//!!! #define INT 8 // ATmega 328P
 
 void setup()
 {
@@ -18,9 +18,9 @@ void setup()
   //swSerial.begin(115200);
   Serial.println("#Cvak...");
 
-  pinMode(STROKE, INPUT);
+  pinMode(INT, INPUT);
 
-  Wire.setClock(100000);
+//!!!  Wire.setClock(100000);
 
 /*
   Wire.beginTransmission(3); // transmit to device #44 (0x2c)
@@ -51,7 +51,7 @@ int32_t counter=0;
 
 void loop()
 {             
-  while(digitalRead(STROKE))
+  while(digitalRead(INT))
   {
     delay(2);
     
@@ -60,7 +60,7 @@ void loop()
     dataString += String(counter++);  
     dataString += ",";
 
-    Wire.requestFrom(3, (uint8_t)9);    // request 9 bytes from slave device #3
+    Wire.requestFrom((uint8_t)3, (uint8_t)9);    // request 9 bytes from slave device #3
 
     for (int8_t reg=0; reg<9; reg++)
     { 
