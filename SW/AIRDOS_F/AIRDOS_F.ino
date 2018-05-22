@@ -171,9 +171,9 @@ void loop()
   sbi(ADCSRA, ADIF);        // reset interrupt flag from ADC
 
   uint16_t suppress = 0;      
-  uint8_t stroke_time = 0;      
-  //!!! boolean stroke_detected = false;
-
+  uint8_t strokes = 0;  
+  uint8_t lightning[10][8];
+    
   // dosimeter integration
   for (uint8_t i=0; i<10; i++)
   {
@@ -211,10 +211,17 @@ void loop()
       }
     }
     
-    stroke_time++;
     if (digitalRead(INT))
     {
-      break;
+      delay(2); // minimal delay after stroke interrupt
+
+      Wire.requestFrom((uint8_t)3, (uint8_t)8);    // request 9 bytes from slave device #3
+
+      for (int8_t reg=0; reg<8; reg++)
+      { 
+        lightning[strokes][reg] = Wire.read();    // receive a byte
+      }
+      lightning[strokes++][0] = i;
     }
   }  
   // Data out
@@ -222,9 +229,40 @@ void loop()
     DateTime now = rtc.now();
 
     // make a string for assembling the data to log:
-    String dataString = "$CANDY,";
+    String dataString = "";
 
-    dataString += String(count++); 
+    for(int n=0; n<strokes; n++)  
+    {
+      uint32_t stroke, stroke_energy;
+  
+      dataString += "$STROKE,";
+
+      dataString += String(count); 
+      dataString += ",";
+
+      dataString += String(now.unixtime() - (9 - lightning[n][0]));  // Time of discharge
+      dataString += ",";
+
+      dataString += String(lightning[n][3]);  // Type of discharge
+      dataString += ",";
+
+      stroke_energy = lightning[n][4];
+      stroke = lightning[n][5];
+      stroke_energy += stroke << 8;
+      stroke = lightning[n][6] & 0b11111;
+      stroke_energy += stroke << 16;
+  
+      dataString += String(stroke_energy);  // Energy of single stroke
+      dataString += ",";
+    
+      dataString += String(lightning[n][7] & 0b111111);  // Distance from storm
+      dataString += "\r\n";
+    }
+
+    // make a string for assembling the data to log:
+    dataString += "$CANDY,";
+
+    dataString += String(count); 
     dataString += ",";
   
     dataString += String(now.unixtime()); 
@@ -237,41 +275,10 @@ void loop()
     }
 
     dataString += String(suppress);
-    dataString += ",";
 
-    dataString += String(stroke_time);
-    dataString += ",";
+    count++;
 
     {
-      uint32_t stroke, stroke_energy;
-      int lightning[9];
-
-      delay(2); // minimal delay after stroke interrupt
-
-      Wire.requestFrom((uint8_t)3, (uint8_t)9);    // request 9 bytes from slave device #3
-
-      for (int8_t reg=0; reg<9; reg++)
-      { 
-        lightning[reg] = Wire.read();    // receive a byte
-        dataString += String(lightning[reg], HEX); 
-        dataString += ",";
-      }
-  
-      stroke_energy = lightning[4];
-      stroke = lightning[5];
-      stroke_energy += stroke << 8;
-      stroke = lightning[6] & 0b11111;
-      stroke_energy += stroke << 16;
-  
-      dataString += String(stroke_energy);  // Energy of single stroke
-      dataString += ",";
-    
-      dataString += String(lightning[7] & 0b111111);  // Distance from storm
-    }
-  
-
-    {
-
       PORTB = 0b00001110;  // SDcard Power ON
       pinMode(MOSI, OUTPUT);     
 
@@ -291,7 +298,7 @@ void loop()
       // if the file is available, write to it:
       if (dataFile) 
       {
-        dataFile.println(dataString);  // write to SDcard
+        dataFile.print(dataString);  // write to SDcard
         
         digitalWrite(LED_yellow, LOW);  // Blink for Dasa
         
