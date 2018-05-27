@@ -107,7 +107,7 @@ void setup()
 //	14	|	A14			|	A9			|	1x
 //	15	|	A15			|	A9			|	1x
   #define pin 0
-  uint8_t analog_reference = INTERNAL2V56; // DEFAULT, INTERNAL, INTERNAL1V1, INTERNAL2V56, or EXTERNAL
+  uint8_t analog_reference = EXTERNAL; // DEFAULT, INTERNAL, INTERNAL1V1, INTERNAL2V56, or EXTERNAL
 
   ADMUX = (analog_reference << 6) | ((pin | 0x10) & 0x1F);
   
@@ -122,14 +122,15 @@ void setup()
 
   pinMode(INT, INPUT);      // interrupt from lightning detector
      
-  pinMode(SDpower1, OUTPUT);  // SDcard interface
-  pinMode(SDpower2, OUTPUT);     
-  pinMode(SDpower3, OUTPUT);     
-  pinMode(SS, OUTPUT);     
-  pinMode(MOSI, INPUT);     
-  pinMode(MISO, INPUT);     
-  pinMode(SCK, OUTPUT);  
+  //pinMode(SDpower1, OUTPUT);  // SDcard interface
+  //pinMode(SDpower2, OUTPUT);     
+  //pinMode(SDpower3, OUTPUT);     
+  //pinMode(SS, OUTPUT);     
+  //pinMode(MOSI, INPUT);     
+  //pinMode(MISO, INPUT);     
+  //pinMode(SCK, OUTPUT);  
 
+  DDRB = 0b10011110;
   PORTB = 0b00000000;  // SDcard Power OFF
 
   pinMode(LED_yellow, OUTPUT);
@@ -155,19 +156,17 @@ void loop()
   uint8_t lo, hi;
   uint16_t u_sensor, maximum;
   uint16_t buffer[CHANNELS];
-  
+
   for(int n=0; n<CHANNELS; n++)
   {
     buffer[n]=0;
   }
   
-  while (bit_is_clear(ADCSRA, ADIF)); // wait for conversion 
-  sbi(ADCSRA, ADIF);                  // reset interrupt flag
-  while (bit_is_clear(ADCSRA, ADIF)); // wait for conversion 
-  delayMicroseconds(24);              // wait for 1.5 cycle of 62.5 kHz ADC clock for sample/hold
-  PORTB = 1;                          // Reset peak detector
-  asm("NOP");                         // cca 3 us
-  PORTB = 0;
+  PORTB = 1;                          // Set reset output for peak detector to H
+  while (bit_is_clear(ADCSRA, ADIF)); // wait for the first dummy conversion 
+  DDRB = 0b10011111;                  // Reset peak detector
+  delayMicroseconds(100);             // guaranteed reset
+  DDRB = 0b10011110;
   sbi(ADCSRA, ADIF);        // reset interrupt flag from ADC
 
   uint16_t suppress = 0;      
@@ -175,16 +174,35 @@ void loop()
   uint8_t lightning[10][8];
     
   // dosimeter integration
-  for (uint8_t i=0; i<10; i++)
+  for (uint8_t i=0; i<10; i++)    // cca 10 s
   {
-    for (uint16_t n=0; n<4096; n++) // cca 1 s
+    while (bit_is_clear(ADCSRA, ADIF)); // wait for dummy conversion 
+    DDRB = 0b10011111;                  // Reset peak detector
+    asm("NOP");                         // cca 6 us for 2k2 resistor and 1k capacitor in peak detector
+    asm("NOP");                         
+    asm("NOP");                         
+    asm("NOP");                         
+    DDRB = 0b10011110;
+    sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
+
+    for (uint16_t n=0; n<4600; n++) // cca 1 s
     {      
-      while (bit_is_clear(ADCSRA, ADIF)); // wait for conversion 
-      delayMicroseconds(24);              // wait for 1.5 cycle of 62.5 kHz ADC clock for sample/hold
-      PORTB = 1;                          // Reset peak detector
-      asm("NOP");                         // cca 3 us
-      PORTB = 0;
-      sbi(ADCSRA, ADIF);        // reset interrupt flag from ADC
+      while (bit_is_clear(ADCSRA, ADIF)); // wait for end of conversion 
+      //delayMicroseconds(24);            // 24 us wait for 1.5 cycle of 62.5 kHz ADC clock for sample/hold for next conversion
+      asm("NOP");                         // cca 8 us after loop
+      asm("NOP");                         
+      asm("NOP");                         
+      asm("NOP");                         
+      asm("NOP");                         
+      asm("NOP");                         
+      
+      DDRB = 0b10011111;                  // Reset peak detector
+      asm("NOP");                         // cca 6 us for 2k2 resistor and 1k capacitor in peak detector
+      asm("NOP");                         
+      asm("NOP");                         
+      asm("NOP");                         
+      DDRB = 0b10011110;
+      sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
   
       // we have to read ADCL first; doing so locks both ADCL
       // and ADCH until ADCH is read.  reading ADCL second would
@@ -224,6 +242,7 @@ void loop()
       lightning[strokes++][0] = i;
     }
   }  
+  
   // Data out
   {
     DateTime now = rtc.now();
@@ -268,19 +287,35 @@ void loop()
     dataString += String(now.unixtime()); 
     dataString += ",";
 
+
+    #define NOISE 274
+    uint32_t dose=0;
+
+    
     for(int n=CHANNELS/2; n<CHANNELS; n++)  
+    //!!! for(int n=0; n<CHANNELS; n++)  
     {
       dataString += String(buffer[n]); 
+      //dataString += "\t";
       dataString += ",";
+      //if (n==NOISE) dataString += "*,";
+    }
+
+    
+    for(int n=NOISE; n<CHANNELS; n++)  
+    {
+      dose += buffer[n]; 
     }
 
     dataString += String(suppress);
+    dataString += ",";
+    dataString += String(dose);
 
     count++;
 
     {
-      PORTB = 0b00001110;  // SDcard Power ON
-      pinMode(MOSI, OUTPUT);     
+      DDRB = 0b10111110;
+      PORTB = 0b00001111;  // SDcard Power ON
 
       // make sure that the default chip select pin is set to output
       // see if the card is present and can be initialized:
@@ -298,10 +333,9 @@ void loop()
       // if the file is available, write to it:
       if (dataFile) 
       {
-        dataFile.print(dataString);  // write to SDcard
-        
         digitalWrite(LED_yellow, LOW);  // Blink for Dasa
-        
+        dataFile.println(dataString);  // write to SDcard (800 ms)     
+        digitalWrite(LED_yellow, HIGH);          
         dataFile.close();
       }  
       // if the file isn't open, pop up an error:
@@ -310,12 +344,11 @@ void loop()
         Serial.println("#error opening datalog.txt");
       }
 
-      pinMode(MOSI, INPUT);      
-      PORTB = 0b00000000;  // SDcard Power OFF
+      DDRB = 0b10011110;
+      PORTB = 0b00000001;  // SDcard Power OFF
     }  
         
-    Serial.println(dataString);  // print to terminal
-    digitalWrite(LED_yellow, HIGH);  
+    Serial.println(dataString);  // print to terminal (additional 700 ms)
   }    
 }
 
