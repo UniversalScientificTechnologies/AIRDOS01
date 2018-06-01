@@ -107,7 +107,7 @@ void setup()
 //	14	|	A14			|	A9			|	1x
 //	15	|	A15			|	A9			|	1x
   #define pin 0
-  uint8_t analog_reference = EXTERNAL; // DEFAULT, INTERNAL, INTERNAL1V1, INTERNAL2V56, or EXTERNAL
+  uint8_t analog_reference = INTERNAL2V56; // DEFAULT, INTERNAL, INTERNAL1V1, INTERNAL2V56, or EXTERNAL
 
   ADMUX = (analog_reference << 6) | ((pin | 0x10) & 0x1F);
   
@@ -132,6 +132,13 @@ void setup()
 
   DDRB = 0b10011110;
   PORTB = 0b00000000;  // SDcard Power OFF
+
+  DDRA = 0b11111100;
+  PORTA = 0b00000000;  // SDcard Power OFF
+  DDRC = 0b11101100;
+  PORTC = 0b00000000;  // SDcard Power OFF
+  DDRD = 0b11111100;
+  PORTD = 0b00000000;  // SDcard Power OFF
 
   pinMode(LED_yellow, OUTPUT);
   digitalWrite(LED_yellow, HIGH);  
@@ -182,6 +189,7 @@ void loop()
     asm("NOP");                         
     asm("NOP");                         
     asm("NOP");                         
+    asm("NOP");                         
     DDRB = 0b10011110;
     sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
 
@@ -197,7 +205,8 @@ void loop()
       asm("NOP");                         
       
       DDRB = 0b10011111;                  // Reset peak detector
-      asm("NOP");                         // cca 6 us for 2k2 resistor and 1k capacitor in peak detector
+      asm("NOP");                         // cca 7 us for 2k2 resistor and 100n capacitor in peak detector
+      asm("NOP");                         
       asm("NOP");                         
       asm("NOP");                         
       asm("NOP");                         
@@ -348,7 +357,7 @@ void loop()
       PORTB = 0b00000001;  // SDcard Power OFF
     }  
         
-    Serial.println(dataString);  // print to terminal (additional 700 ms)
+//!!!DEBUG    Serial.println(dataString);  // print to terminal (additional 700 ms)
   }    
 }
 
