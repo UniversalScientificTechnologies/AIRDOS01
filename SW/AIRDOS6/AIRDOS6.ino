@@ -57,6 +57,7 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
 #include "wiring_private.h"
 #include <Wire.h>           // Tested with version 1.0.0.
 #include "RTClib.h"         // Tested with version 1.5.4.
+#include <SoftwareSerial.h>
 
 #define LED_yellow  23 // PC7
 #define RESET     0    // PB0
@@ -86,7 +87,7 @@ void setup()
   }
 
   Serial.println("#Cvak...");
-  
+
 // Read Analog Differential without gain (read datashet of ATMega1280 and ATMega2560 for refference)
 // Use analogReadDiff(NUM)
 //   NUM	|	POS PIN	  	        |	NEG PIN		        | 	GAIN
@@ -122,6 +123,9 @@ void setup()
 
   pinMode(INT, INPUT);      // interrupt from lightning detector
      
+  pinMode(21, INPUT);      // SW Serial
+  pinMode(22, INPUT);      // SW Serial
+
   //pinMode(SDpower1, OUTPUT);  // SDcard interface
   //pinMode(SDpower2, OUTPUT);     
   //pinMode(SDpower3, OUTPUT);     
@@ -155,6 +159,11 @@ void setup()
   }
   
   Serial.println("#Hmmm...");
+
+  // airborne <2g; 40 configuration bytes
+  const char cmd[44]={0xB5, 0x62 ,0x06 ,0x24 ,0x24 ,0x00 ,0xFF ,0xFF ,0x07 ,0x03 ,0x00 ,0x00 ,0x00 ,0x00 ,0x10 ,0x27 , 0x00 ,0x00 ,0x05 ,0x00 ,0xFA ,0x00 ,0xFA ,0x00 ,0x64 ,0x00 ,0x2C ,0x01 ,0x00 ,0x3C ,0x00 ,0x00 , 0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x53 ,0x0A};
+  for (int n=0;n<44;n++) Serial.write(cmd[n]); 
+
 }
 
 
@@ -358,7 +367,72 @@ void loop()
     }  
         
 //!!!DEBUG    
-Serial.println(dataString);  // print to terminal (additional 700 ms)
+//Serial.println(dataString);  // print to terminal (additional 700 ms)
+
+
+#define MSG_NO 10    // number of logged NMEA messages
+
+    // make a string for assembling the NMEA to log:
+    dataString = "";
+    char incomingByte; 
+
+    // flush serial buffer
+    while (Serial.available()) Serial.read();
+
+    boolean flag = false;
+    int messages = 0;
+    while(true)
+    {
+      if (Serial.available()) 
+      {
+        // read the incoming byte:
+        incomingByte = Serial.read();
+        
+        if (incomingByte == '$') {flag = true; messages++;};
+        if (messages > MSG_NO) break;
+        
+        // say what you got:
+        if (flag && (messages<=MSG_NO)) dataString+=incomingByte;
+      }
+    }
+
+    {
+        DDRB = 0b10111110;
+        PORTB = 0b00001111;  // SDcard Power ON
+        
+        // make sure that the default chip select pin is set to output
+        // see if the card is present and can be initialized:
+        if (!SD.begin(SS)) 
+        {
+          Serial.println("#Card failed, or not present");
+          // don't do anything more:
+          return;
+        }
+        
+        // open the file. note that only one file can be open at a time,
+        // so you have to close this one before opening another.
+        File dataFile = SD.open("datalog.txt", FILE_WRITE);
+        
+        // if the file is available, write to it:
+        if (dataFile) 
+        {
+          digitalWrite(LED_yellow, LOW);  // Blink for Dasa
+          dataFile.print(dataString);  // write to SDcard (800 ms)     
+          digitalWrite(LED_yellow, HIGH);          
+          dataFile.close();
+        }  
+        // if the file isn't open, pop up an error:
+        else 
+        {
+          Serial.println("#error opening datalog.txt");
+        }
+        
+        DDRB = 0b10011110;
+        PORTB = 0b00000001;  // SDcard Power OFF
+    }  
+//!!!DEBUG    
+//Serial.print(dataString);  // print to terminal (additional 700 ms)
+
   }    
 }
 
