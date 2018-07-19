@@ -75,6 +75,28 @@ uint16_t count = 0;
 
 RTC_Millis rtc;
 
+// Read Analog Differential without gain (read datashet of ATMega1280 and ATMega2560 for refference)
+// Use analogReadDiff(NUM)
+//   NUM  | POS PIN             | NEG PIN           |   GAIN
+//  0 | A0      | A1      | 1x
+//  1 | A1      | A1      | 1x
+//  2 | A2      | A1      | 1x
+//  3 | A3      | A1      | 1x
+//  4 | A4      | A1      | 1x
+//  5 | A5      | A1      | 1x
+//  6 | A6      | A1      | 1x
+//  7 | A7      | A1      | 1x
+//  8 | A8      | A9      | 1x
+//  9 | A9      | A9      | 1x
+//  10  | A10     | A9      | 1x
+//  11  | A11     | A9      | 1x
+//  12  | A12     | A9      | 1x
+//  13  | A13     | A9      | 1x
+//  14  | A14     | A9      | 1x
+//  15  | A15     | A9      | 1x
+#define PIN 0
+uint8_t analog_reference = INTERNAL2V56; // DEFAULT, INTERNAL, INTERNAL1V1, INTERNAL2V56, or EXTERNAL
+
 void setup()
 {
 
@@ -87,29 +109,7 @@ void setup()
 
   Serial.println("#Cvak...");
   
-// Read Analog Differential without gain (read datashet of ATMega1280 and ATMega2560 for refference)
-// Use analogReadDiff(NUM)
-//   NUM	|	POS PIN	  	        |	NEG PIN		        | 	GAIN
-//	0	|	A0			|	A1			|	1x
-//	1	|	A1			|	A1			|	1x
-//	2	|	A2			|	A1			|	1x
-//	3	|	A3			|	A1			|	1x
-//	4	|	A4			|	A1			|	1x
-//	5	|	A5			|	A1			|	1x
-//	6	|	A6			|	A1			|	1x
-//	7	|	A7			|	A1			|	1x
-//	8	|	A8			|	A9			|	1x
-//	9	|	A9			|	A9			|	1x
-//	10	|	A10			|	A9			|	1x
-//	11	|	A11			|	A9			|	1x
-//	12	|	A12			|	A9			|	1x
-//	13	|	A13			|	A9			|	1x
-//	14	|	A14			|	A9			|	1x
-//	15	|	A15			|	A9			|	1x
-  #define pin 0
-  uint8_t analog_reference = INTERNAL2V56; // DEFAULT, INTERNAL, INTERNAL1V1, INTERNAL2V56, or EXTERNAL
-
-  ADMUX = (analog_reference << 6) | ((pin | 0x10) & 0x1F);
+  ADMUX = (analog_reference << 6) | ((PIN | 0x10) & 0x1F);
   
   ADCSRB = 0;               // Switching ADC to Free Running mode
   sbi(ADCSRA, ADATE);       // ADC autotrigger enable (mandatory for free running mode)
@@ -141,7 +141,7 @@ void setup()
   PORTD = 0b00000000;  // SDcard Power OFF
 
   pinMode(LED_yellow, OUTPUT);
-  digitalWrite(LED_yellow, HIGH);  
+  digitalWrite(LED_yellow, LOW);  
   digitalWrite(RESET, LOW);  
   
   //!!! Wire.setClock(100000);
@@ -149,9 +149,9 @@ void setup()
   for(int i=0; i<5; i++)  
   {
     delay(50);
-    digitalWrite(LED_yellow, LOW);  // Blink for Dasa 
+    digitalWrite(LED_yellow, HIGH);  // Blink for Dasa 
     delay(50);
-    digitalWrite(LED_yellow, HIGH);  
+    digitalWrite(LED_yellow, LOW);  
   }
   
   Serial.println("#Hmmm...");
@@ -163,11 +163,39 @@ void loop()
   uint8_t lo, hi;
   uint16_t u_sensor, maximum;
   uint16_t buffer[CHANNELS];
-
+  uint16_t offset;
+  
   for(int n=0; n<CHANNELS; n++)
   {
     buffer[n]=0;
   }
+
+  // measurement of ADC offset
+  ADMUX = (analog_reference << 6) | 0b10001; // Select +A1,-A1 for offset correction
+  ADCSRB = 0;               // Switching ADC to Free Running mode
+  sbi(ADCSRA, ADATE);       // ADC autotrigger enable (mandatory for free running mode)
+  sbi(ADCSRA, ADSC);        // ADC start the first conversions
+  sbi(ADCSRA, 2);           // 0x100 = clock divided by 16, 62.5 kHz, 208 us for 13 cycles of one AD conversion, 24 us fo 1.5 cycle for sample-hold
+  cbi(ADCSRA, 1);        
+  cbi(ADCSRA, 0);        
+  while (bit_is_clear(ADCSRA, ADIF)); // wait for the first dummy conversion 
+  sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
+  while (bit_is_clear(ADCSRA, ADIF)); // wait for the first conversion 
+  sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
+  lo = ADCL;
+  hi = ADCH;
+  ADMUX = (analog_reference << 6) | 0b10000; // Select +A0,-A1 for measurement
+  ADCSRB = 0;               // Switching ADC to Free Running mode
+  sbi(ADCSRA, ADATE);       // ADC autotrigger enable (mandatory for free running mode)
+  sbi(ADCSRA, ADSC);        // ADC start the first conversions
+  sbi(ADCSRA, 2);           // 0x100 = clock divided by 16, 62.5 kHz, 208 us for 13 cycles of one AD conversion, 24 us fo 1.5 cycle for sample-hold
+  cbi(ADCSRA, 1);        
+  cbi(ADCSRA, 0);        
+  // combine the two bytes
+  u_sensor = (hi << 7) | (lo >> 1);
+  // manage negative values
+  if (u_sensor <= (CHANNELS/2)-1 ) {u_sensor += (CHANNELS/2);} else {u_sensor -= (CHANNELS/2);}
+  offset = u_sensor;
   
   PORTB = 1;                          // Set reset output for peak detector to H
   while (bit_is_clear(ADCSRA, ADIF)); // wait for the first dummy conversion 
@@ -297,11 +325,12 @@ void loop()
     dataString += ",";
 
 
-    #define NOISE 274
+    uint16_t noise = offset+6;
     uint32_t dose=0;
-
+    #define RANGE 252
     
-    for(int n=CHANNELS/2; n<CHANNELS; n++)  
+    for(int n=offset; n<(offset+RANGE); n++)  
+    //!!! for(int n=CHANNELS/2-offset; n<CHANNELS-offset; n++)  
     //!!! for(int n=0; n<CHANNELS; n++)  
     {
       dataString += String(buffer[n]); 
@@ -311,7 +340,7 @@ void loop()
     }
 
     
-    for(int n=NOISE; n<CHANNELS; n++)  
+    for(int n=noise; n<(offset+RANGE); n++)  
     {
       dose += buffer[n]; 
     }
@@ -319,6 +348,8 @@ void loop()
     dataString += String(suppress);
     dataString += ",";
     dataString += String(dose);
+    dataString += ",";
+    dataString += String(offset);
 
     count++;
 
@@ -342,10 +373,15 @@ void loop()
       // if the file is available, write to it:
       if (dataFile) 
       {
-        digitalWrite(LED_yellow, LOW);  // Blink for Dasa
+        //digitalWrite(LED_yellow, HIGH);  // Blink for Dasa
         dataFile.println(dataString);  // write to SDcard (800 ms)     
-        digitalWrite(LED_yellow, HIGH);          
+        //digitalWrite(LED_yellow, LOW);          
         dataFile.close();
+    
+        dataString.remove(100); //!!!DEBUG
+        digitalWrite(LED_yellow, HIGH);  // Blink for Dasa
+        Serial.println(dataString);  // print to terminal (additional 700 ms)
+        digitalWrite(LED_yellow, LOW);          
       }  
       // if the file isn't open, pop up an error:
       else 
@@ -355,10 +391,7 @@ void loop()
 
       DDRB = 0b10011110;
       PORTB = 0b00000001;  // SDcard Power OFF
-    }  
-        
-//!!!DEBUG    
-Serial.println(dataString);  // print to terminal (additional 700 ms)
+    }          
   }    
 }
 
