@@ -1,4 +1,3 @@
-// 3 mesice s LS 33600 = 7.6 mA
 /*
   AIRDOS with RTC
  
@@ -25,7 +24,7 @@ RESET  0   PB0
 
 LED
 ---
-LED_yellow  23  PC7         // LED for Dasa
+LED_red  23  PC7         // LED for Dasa
 
 
                      Mighty 1284p    
@@ -59,11 +58,12 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
 #include "RTClib.h"         // Tested with version 1.5.4.
 #include <SoftwareSerial.h>
 
-#define LED_yellow  23 // PC7
+#define LED_red  23 // PC7
 #define RESET     0    // PB0
 #define SDpower1  1    // PB1
 #define SDpower2  2    // PB2
 #define SDpower3  3    // PB3
+#define GPSpower  26   // PA2
 #define SS        4    // PB4
 #define MOSI      5    // PB5
 #define MISO      6    // PB6
@@ -75,6 +75,28 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
 uint16_t count = 0;
 
 RTC_Millis rtc;
+
+// Read Analog Differential without gain (read datashet of ATMega1280 and ATMega2560 for refference)
+// Use analogReadDiff(NUM)
+//   NUM  | POS PIN             | NEG PIN           |   GAIN
+//  0 | A0      | A1      | 1x
+//  1 | A1      | A1      | 1x
+//  2 | A2      | A1      | 1x
+//  3 | A3      | A1      | 1x
+//  4 | A4      | A1      | 1x
+//  5 | A5      | A1      | 1x
+//  6 | A6      | A1      | 1x
+//  7 | A7      | A1      | 1x
+//  8 | A8      | A9      | 1x
+//  9 | A9      | A9      | 1x
+//  10  | A10     | A9      | 1x
+//  11  | A11     | A9      | 1x
+//  12  | A12     | A9      | 1x
+//  13  | A13     | A9      | 1x
+//  14  | A14     | A9      | 1x
+//  15  | A15     | A9      | 1x
+#define pin 0
+uint8_t analog_reference = INTERNAL2V56; // DEFAULT, INTERNAL, INTERNAL1V1, INTERNAL2V56, or EXTERNAL
 
 void setup()
 {
@@ -88,28 +110,6 @@ void setup()
 
   Serial.println("#Cvak...");
 
-// Read Analog Differential without gain (read datashet of ATMega1280 and ATMega2560 for refference)
-// Use analogReadDiff(NUM)
-//   NUM	|	POS PIN	  	        |	NEG PIN		        | 	GAIN
-//	0	|	A0			|	A1			|	1x
-//	1	|	A1			|	A1			|	1x
-//	2	|	A2			|	A1			|	1x
-//	3	|	A3			|	A1			|	1x
-//	4	|	A4			|	A1			|	1x
-//	5	|	A5			|	A1			|	1x
-//	6	|	A6			|	A1			|	1x
-//	7	|	A7			|	A1			|	1x
-//	8	|	A8			|	A9			|	1x
-//	9	|	A9			|	A9			|	1x
-//	10	|	A10			|	A9			|	1x
-//	11	|	A11			|	A9			|	1x
-//	12	|	A12			|	A9			|	1x
-//	13	|	A13			|	A9			|	1x
-//	14	|	A14			|	A9			|	1x
-//	15	|	A15			|	A9			|	1x
-  #define pin 0
-  uint8_t analog_reference = INTERNAL2V56; // DEFAULT, INTERNAL, INTERNAL1V1, INTERNAL2V56, or EXTERNAL
-
   ADMUX = (analog_reference << 6) | ((pin | 0x10) & 0x1F);
   
   ADCSRB = 0;               // Switching ADC to Free Running mode
@@ -120,7 +120,7 @@ void setup()
   cbi(ADCSRA, 0);        
 
   pinMode(RESET, OUTPUT);   // reset for peak detetor
-
+  pinMode(GPSpower, OUTPUT);// Power SW for GPS
   pinMode(INT, INPUT);      // interrupt from lightning detector
      
   pinMode(21, INPUT);      // SW Serial
@@ -144,243 +144,306 @@ void setup()
   DDRD = 0b11111100;
   PORTD = 0b00000000;  // SDcard Power OFF
 
-  pinMode(LED_yellow, OUTPUT);
-  digitalWrite(LED_yellow, HIGH);  
+  pinMode(LED_red, OUTPUT);
+  digitalWrite(LED_red, LOW);  
   digitalWrite(RESET, LOW);  
+  digitalWrite(GPSpower, LOW);
   
   //!!! Wire.setClock(100000);
 
   for(int i=0; i<5; i++)  
   {
     delay(50);
-    digitalWrite(LED_yellow, LOW);  // Blink for Dasa 
+    digitalWrite(LED_red, HIGH);  // Blink for Dasa 
     delay(50);
-    digitalWrite(LED_yellow, HIGH);  
+    digitalWrite(LED_red, LOW);  
   }
   
   Serial.println("#Hmmm...");
-
-  // airborne <2g; 40 configuration bytes
-  const char cmd[44]={0xB5, 0x62 ,0x06 ,0x24 ,0x24 ,0x00 ,0xFF ,0xFF ,0x07 ,0x03 ,0x00 ,0x00 ,0x00 ,0x00 ,0x10 ,0x27 , 0x00 ,0x00 ,0x05 ,0x00 ,0xFA ,0x00 ,0xFA ,0x00 ,0x64 ,0x00 ,0x2C ,0x01 ,0x00 ,0x3C ,0x00 ,0x00 , 0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x53 ,0x0A};
-  for (int n=0;n<44;n++) Serial.write(cmd[n]); 
-
 }
 
 
 void loop()
 {
-  uint8_t lo, hi;
-  uint16_t u_sensor, maximum;
-  uint16_t buffer[CHANNELS];
-
-  for(int n=0; n<CHANNELS; n++)
-  {
-    buffer[n]=0;
-  }
-  
-  PORTB = 1;                          // Set reset output for peak detector to H
-  while (bit_is_clear(ADCSRA, ADIF)); // wait for the first dummy conversion 
-  DDRB = 0b10011111;                  // Reset peak detector
-  delayMicroseconds(100);             // guaranteed reset
-  DDRB = 0b10011110;
-  sbi(ADCSRA, ADIF);        // reset interrupt flag from ADC
-
-  uint16_t suppress = 0;      
-  uint8_t strokes = 0;  
-  uint8_t lightning[10][8];
+  for(int mes=0; mes<(5*6); mes++) // Mere than 5 minutes of measurements
+  {  
+    uint8_t lo, hi;
+    uint16_t u_sensor, maximum;
+    uint16_t buffer[CHANNELS];
+    uint16_t offset;
     
-  // dosimeter integration
-  for (uint8_t i=0; i<10; i++)    // cca 10 s
-  {
-    while (bit_is_clear(ADCSRA, ADIF)); // wait for dummy conversion 
-    DDRB = 0b10011111;                  // Reset peak detector
-    asm("NOP");                         // cca 6 us for 2k2 resistor and 1k capacitor in peak detector
-    asm("NOP");                         
-    asm("NOP");                         
-    asm("NOP");                         
-    asm("NOP");                         
-    DDRB = 0b10011110;
+    for(int n=0; n<CHANNELS; n++)
+    {
+      buffer[n]=0;
+    }
+    
+    // measurement of ADC offset
+    ADMUX = (analog_reference << 6) | 0b10001; // Select +A1,-A1 for offset correction
+    ADCSRB = 0;               // Switching ADC to Free Running mode
+    sbi(ADCSRA, ADATE);       // ADC autotrigger enable (mandatory for free running mode)
+    sbi(ADCSRA, ADSC);        // ADC start the first conversions
+    sbi(ADCSRA, 2);           // 0x100 = clock divided by 16, 62.5 kHz, 208 us for 13 cycles of one AD conversion, 24 us fo 1.5 cycle for sample-hold
+    cbi(ADCSRA, 1);        
+    cbi(ADCSRA, 0);        
+    while (bit_is_clear(ADCSRA, ADIF)); // wait for the first dummy conversion 
     sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
-
-    for (uint16_t n=0; n<4600; n++) // cca 1 s
-    {      
-      while (bit_is_clear(ADCSRA, ADIF)); // wait for end of conversion 
-      //delayMicroseconds(24);            // 24 us wait for 1.5 cycle of 62.5 kHz ADC clock for sample/hold for next conversion
-      asm("NOP");                         // cca 8 us after loop
-      asm("NOP");                         
-      asm("NOP");                         
-      asm("NOP");                         
-      asm("NOP");                         
-      asm("NOP");                         
+    while (bit_is_clear(ADCSRA, ADIF)); // wait for the first conversion 
+    sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
+    lo = ADCL;
+    hi = ADCH;
+    ADMUX = (analog_reference << 6) | 0b10000; // Select +A0,-A1 for measurement
+    ADCSRB = 0;               // Switching ADC to Free Running mode
+    sbi(ADCSRA, ADATE);       // ADC autotrigger enable (mandatory for free running mode)
+    sbi(ADCSRA, ADSC);        // ADC start the first conversions
+    sbi(ADCSRA, 2);           // 0x100 = clock divided by 16, 62.5 kHz, 208 us for 13 cycles of one AD conversion, 24 us fo 1.5 cycle for sample-hold
+    cbi(ADCSRA, 1);        
+    cbi(ADCSRA, 0);        
+    // combine the two bytes
+    u_sensor = (hi << 7) | (lo >> 1);
+    // manage negative values
+    if (u_sensor <= (CHANNELS/2)-1 ) {u_sensor += (CHANNELS/2);} else {u_sensor -= (CHANNELS/2);}
+    offset = u_sensor;
+    
+    PORTB = 1;                          // Set reset output for peak detector to H
+    while (bit_is_clear(ADCSRA, ADIF)); // wait for the first dummy conversion 
+    DDRB = 0b10011111;                  // Reset peak detector
+    delayMicroseconds(100);             // guaranteed reset
+    DDRB = 0b10011110;
+    sbi(ADCSRA, ADIF);        // reset interrupt flag from ADC
+    
+    uint16_t suppress = 0;      
+    uint8_t strokes = 0;  
+    uint8_t lightning[10][8];
       
+    // dosimeter integration
+    for (uint8_t i=0; i<10; i++)    // cca 10 s
+    {
+      while (bit_is_clear(ADCSRA, ADIF)); // wait for dummy conversion 
       DDRB = 0b10011111;                  // Reset peak detector
-      asm("NOP");                         // cca 7 us for 2k2 resistor and 100n capacitor in peak detector
+      asm("NOP");                         // cca 6 us for 2k2 resistor and 1k capacitor in peak detector
       asm("NOP");                         
       asm("NOP");                         
       asm("NOP");                         
       asm("NOP");                         
       DDRB = 0b10011110;
       sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
-  
-      // we have to read ADCL first; doing so locks both ADCL
-      // and ADCH until ADCH is read.  reading ADCL second would
-      // cause the results of each conversion to be discarded,
-      // as ADCL and ADCH would be locked when it completed.
-      lo = ADCL;
-      hi = ADCH;
-  
-      // combine the two bytes
-      u_sensor = (hi << 7) | (lo >> 1);
-  
-      // manage negative values
-      if (u_sensor <= (CHANNELS/2)-1 ) {u_sensor += (CHANNELS/2);} else {u_sensor -= (CHANNELS/2);}
-                
-      if (u_sensor > maximum) // filter double detection for pulses between two samples
-      {
-        maximum = u_sensor;
-        suppress++;
-      }
-      else
-      {
-        buffer[maximum]++;
-        maximum = 0;
-      }
-    }
     
-    if (digitalRead(INT))
-    {
-      delay(2); // minimal delay after stroke interrupt
-
-      Wire.requestFrom((uint8_t)3, (uint8_t)8);    // request 9 bytes from slave device #3
-
-      for (int8_t reg=0; reg<8; reg++)
-      { 
-        lightning[strokes][reg] = Wire.read();    // receive a byte
+      for (uint16_t n=0; n<4600; n++) // cca 1 s
+      {      
+        while (bit_is_clear(ADCSRA, ADIF)); // wait for end of conversion 
+        //delayMicroseconds(24);            // 24 us wait for 1.5 cycle of 62.5 kHz ADC clock for sample/hold for next conversion
+        asm("NOP");                         // cca 8 us after loop
+        asm("NOP");                         
+        asm("NOP");                         
+        asm("NOP");                         
+        asm("NOP");                         
+        asm("NOP");                         
+        
+        DDRB = 0b10011111;                  // Reset peak detector
+        asm("NOP");                         // cca 7 us for 2k2 resistor and 100n capacitor in peak detector
+        asm("NOP");                         
+        asm("NOP");                         
+        asm("NOP");                         
+        asm("NOP");                         
+        DDRB = 0b10011110;
+        sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
+    
+        // we have to read ADCL first; doing so locks both ADCL
+        // and ADCH until ADCH is read.  reading ADCL second would
+        // cause the results of each conversion to be discarded,
+        // as ADCL and ADCH would be locked when it completed.
+        lo = ADCL;
+        hi = ADCH;
+    
+        // combine the two bytes
+        u_sensor = (hi << 7) | (lo >> 1);
+    
+        // manage negative values
+        if (u_sensor <= (CHANNELS/2)-1 ) {u_sensor += (CHANNELS/2);} else {u_sensor -= (CHANNELS/2);}
+                  
+        if (u_sensor > maximum) // filter double detection for pulses between two samples
+        {
+          maximum = u_sensor;
+          suppress++;
+        }
+        else
+        {
+          buffer[maximum]++;
+          maximum = 0;
+        }
       }
-      lightning[strokes++][0] = i;
-    }
-  }  
+      
+      if (digitalRead(INT))
+      {
+        delay(2); // minimal delay after stroke interrupt
+    
+        Wire.requestFrom((uint8_t)3, (uint8_t)8);    // request 9 bytes from slave device #3
+    
+        for (int8_t reg=0; reg<8; reg++)
+        { 
+          lightning[strokes][reg] = Wire.read();    // receive a byte
+        }
+        lightning[strokes++][0] = i;
+      }
+    }  
   
-  // Data out
-  {
-    DateTime now = rtc.now();
-
-    // make a string for assembling the data to log:
-    String dataString = "";
-
-    for(int n=0; n<strokes; n++)  
+    // Data out
     {
-      uint32_t stroke, stroke_energy;
+      DateTime now = rtc.now();
   
-      dataString += "$STROKE,";
-
+      // make a string for assembling the data to log:
+      String dataString = "";
+  
+      for(int n=0; n<strokes; n++)  
+      {
+        uint32_t stroke, stroke_energy;
+    
+        dataString += "$STROKE,";
+  
+        dataString += String(count); 
+        dataString += ",";
+  
+        dataString += String(now.unixtime() - (9 - lightning[n][0]));  // Time of discharge
+        dataString += ",";
+  
+        dataString += String(lightning[n][3]);  // Type of discharge
+        dataString += ",";
+  
+        stroke_energy = lightning[n][4];
+        stroke = lightning[n][5];
+        stroke_energy += stroke << 8;
+        stroke = lightning[n][6] & 0b11111;
+        stroke_energy += stroke << 16;
+    
+        dataString += String(stroke_energy);  // Energy of single stroke
+        dataString += ",";
+      
+        dataString += String(lightning[n][7] & 0b111111);  // Distance from storm
+        dataString += "\r\n";
+      }
+  
+      // make a string for assembling the data to log:
+      dataString += "$CANDY,";
+  
       dataString += String(count); 
       dataString += ",";
-
-      dataString += String(now.unixtime() - (9 - lightning[n][0]));  // Time of discharge
+    
+      dataString += String(now.unixtime()); 
       dataString += ",";
-
-      dataString += String(lightning[n][3]);  // Type of discharge
-      dataString += ",";
-
-      stroke_energy = lightning[n][4];
-      stroke = lightning[n][5];
-      stroke_energy += stroke << 8;
-      stroke = lightning[n][6] & 0b11111;
-      stroke_energy += stroke << 16;
   
-      dataString += String(stroke_energy);  // Energy of single stroke
-      dataString += ",";
-    
-      dataString += String(lightning[n][7] & 0b111111);  // Distance from storm
-      dataString += "\r\n";
-    }
-
-    // make a string for assembling the data to log:
-    dataString += "$CANDY,";
-
-    dataString += String(count); 
-    dataString += ",";
   
-    dataString += String(now.unixtime()); 
-    dataString += ",";
-
-
-    #define NOISE 274
-    uint32_t dose=0;
-
-    
-    for(int n=CHANNELS/2; n<CHANNELS; n++)  
-    //!!! for(int n=0; n<CHANNELS; n++)  
-    {
-      dataString += String(buffer[n]); 
-      //dataString += "\t";
+      uint16_t noise = offset+6;
+      uint32_t dose=0;
+      #define RANGE 252
+      
+      for(int n=offset; n<(offset+RANGE); n++)  
+      {
+        dataString += String(buffer[n]); 
+        //dataString += "\t";
+        dataString += ",";
+        //if (n==NOISE) dataString += "*,";
+      }
+  
+      
+      for(int n=noise; n<(offset+RANGE); n++)  
+      {
+        dose += buffer[n]; 
+      }
+  
+      dataString += String(suppress);
       dataString += ",";
-      //if (n==NOISE) dataString += "*,";
-    }
-
-    
-    for(int n=NOISE; n<CHANNELS; n++)  
-    {
-      dose += buffer[n]; 
-    }
-
-    dataString += String(suppress);
-    dataString += ",";
-    dataString += String(dose);
-
-    count++;
-
-    {
-      DDRB = 0b10111110;
-      PORTB = 0b00001111;  // SDcard Power ON
-
-      // make sure that the default chip select pin is set to output
-      // see if the card is present and can be initialized:
-      if (!SD.begin(SS)) 
+      dataString += String(dose);
+      dataString += ",";
+      dataString += String(offset);
+  
+      count++;
+  
       {
-        Serial.println("#Card failed, or not present");
-        // don't do anything more:
-        return;
-      }
-
-      // open the file. note that only one file can be open at a time,
-      // so you have to close this one before opening another.
-      File dataFile = SD.open("datalog.txt", FILE_WRITE);
-    
-      // if the file is available, write to it:
-      if (dataFile) 
-      {
-        digitalWrite(LED_yellow, LOW);  // Blink for Dasa
-        dataFile.println(dataString);  // write to SDcard (800 ms)     
-        digitalWrite(LED_yellow, HIGH);          
-        dataFile.close();
-      }  
-      // if the file isn't open, pop up an error:
-      else 
-      {
-        Serial.println("#error opening datalog.txt");
-      }
-
-      DDRB = 0b10011110;
-      PORTB = 0b00000001;  // SDcard Power OFF
-    }  
+        DDRB = 0b10111110;
+        PORTB = 0b00001111;  // SDcard Power ON
+  
+        // make sure that the default chip select pin is set to output
+        // see if the card is present and can be initialized:
+        if (!SD.begin(SS)) 
+        {
+          Serial.println("#Card failed, or not present");
+          // don't do anything more:
+          return;
+        }
+  
+        // open the file. note that only one file can be open at a time,
+        // so you have to close this one before opening another.
+        File dataFile = SD.open("datalog.txt", FILE_WRITE);
+      
+        // if the file is available, write to it:
+        if (dataFile) 
+        {
+          digitalWrite(LED_red, HIGH);  // Blink for Dasa
+          dataFile.println(dataString);  // write to SDcard (800 ms)     
+          digitalWrite(LED_red, LOW);          
+          dataFile.close();
+        }  
+        // if the file isn't open, pop up an error:
+        else 
+        {
+          Serial.println("#error opening datalog.txt");
+        }
+  
+        DDRB = 0b10011110;
+        PORTB = 0b00000001;  // SDcard Power OFF
+     }  
         
 //!!!DEBUG    
-//Serial.println(dataString);  // print to terminal (additional 700 ms)
-
+Serial.println(dataString);  // print to terminal (additional 700 ms)
+  } 
+  }      
+  {
+      // make a string for assembling the data to log:
+      String dataString = "";
 
 #define MSG_NO 10    // number of logged NMEA messages
 
-    // make a string for assembling the NMEA to log:
-    dataString = "";
-    char incomingByte; 
-
+    digitalWrite(GPSpower, HIGH); // GPS Power ON
+    delay(100);
+    {
+      // Switch off Galileo and GLONASS; 68 configuration bytes
+      const char cmd[0x3C + 8]={0xB5, 0x62, 0x06, 0x3E, 0x3C, 0x00, 0x00, 0x20, 0x20, 0x07, 0x00, 0x08, 0x10, 0x00, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x03, 0x00, 0x01, 0x00, 0x01, 0x01, 0x02, 0x04, 0x08, 0x00, 0x00, 0x00, 0x01, 0x01, 0x03, 0x08, 0x10, 0x00, 0x00, 0x00, 0x01, 0x01, 0x04, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01, 0x03, 0x05, 0x00, 0x03, 0x00, 0x00, 0x00, 0x01, 0x05, 0x06, 0x08, 0x0E, 0x00, 0x00, 0x00, 0x01, 0x01, 0x53, 0x1F};
+      for (int n=0;n<(0x3C + 8);n++) Serial.write(cmd[n]); 
+    }          
+    {
+      // airborne <2g; 44 configuration bytes
+      const char cmd[0x24 + 8]={0xB5, 0x62 ,0x06 ,0x24 ,0x24 ,0x00 ,0xFF ,0xFF ,0x07 ,0x03 ,0x00 ,0x00 ,0x00 ,0x00 ,0x10 ,0x27 , 0x00 ,0x00 ,0x05 ,0x00 ,0xFA ,0x00 ,0xFA ,0x00 ,0x64 ,0x00 ,0x5E ,0x01 ,0x00 ,0x3C ,0x00 ,0x00 , 0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x85 ,0x2A};
+      for (int n=0;n<(0x24 + 8);n++) Serial.write(cmd[n]); 
+    }
     // flush serial buffer
     while (Serial.available()) Serial.read();
 
     boolean flag = false;
+    char incomingByte; 
     int messages = 0;
+
+    while(true)
+    {
+      if (Serial.available()) 
+      {
+        // read the incoming byte:
+        incomingByte = Serial.read();
+
+        if (incomingByte == '$') {messages++;}; // Prevent endless waiting
+        if (messages > 256) break; // cca 26 s
+
+        if (flag && (incomingByte == '*')) break;
+        flag = false;
+
+        if (incomingByte == 'A') flag = true;   // Waiting for FIX
+      }     
+    }
+    
+    // make a string for assembling the NMEA to log:
+    dataString = "";
+
+    flag = false;
+    messages = 0;
     while(true)
     {
       if (Serial.available()) 
@@ -395,6 +458,7 @@ void loop()
         if (flag && (messages<=MSG_NO)) dataString+=incomingByte;
       }
     }
+    digitalWrite(GPSpower, LOW); // GPS Power OFF
 
     {
         DDRB = 0b10111110;
@@ -416,9 +480,9 @@ void loop()
         // if the file is available, write to it:
         if (dataFile) 
         {
-          digitalWrite(LED_yellow, LOW);  // Blink for Dasa
+          digitalWrite(LED_red, HIGH);  // Blink for Dasa
           dataFile.print(dataString);  // write to SDcard (800 ms)     
-          digitalWrite(LED_yellow, HIGH);          
+          digitalWrite(LED_red, LOW);          
           dataFile.close();
         }  
         // if the file isn't open, pop up an error:
@@ -430,8 +494,9 @@ void loop()
         DDRB = 0b10011110;
         PORTB = 0b00000001;  // SDcard Power OFF
     }  
+  
 //!!!DEBUG    
-//Serial.print(dataString);  // print to terminal (additional 700 ms)
+Serial.print(dataString);  // print to terminal (additional 700 ms)
 
   }    
 }
