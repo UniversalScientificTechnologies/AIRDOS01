@@ -1,8 +1,10 @@
-// 3 mesice s LS 33600 = 7.6 mA
+//#define DEBUG
 /*
   AIRDOS with RTC
  
 Compiled with: Arduino 1.8.5
+
+3 month endurance with LS 33600 = 7.6 mA
 
 ISP
 ---
@@ -172,13 +174,13 @@ void loop()
 
   // measurement of ADC offset
   ADMUX = (analog_reference << 6) | 0b10001; // Select +A1,-A1 for offset correction
+  delay(50);
   ADCSRB = 0;               // Switching ADC to Free Running mode
   sbi(ADCSRA, ADATE);       // ADC autotrigger enable (mandatory for free running mode)
   sbi(ADCSRA, ADSC);        // ADC start the first conversions
   sbi(ADCSRA, 2);           // 0x100 = clock divided by 16, 62.5 kHz, 208 us for 13 cycles of one AD conversion, 24 us fo 1.5 cycle for sample-hold
   cbi(ADCSRA, 1);        
   cbi(ADCSRA, 0);        
-  while (bit_is_clear(ADCSRA, ADIF)); // wait for the first dummy conversion 
   sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
   while (bit_is_clear(ADCSRA, ADIF)); // wait for the first conversion 
   sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
@@ -198,10 +200,26 @@ void loop()
   offset = u_sensor;
   
   PORTB = 1;                          // Set reset output for peak detector to H
+  sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
   while (bit_is_clear(ADCSRA, ADIF)); // wait for the first dummy conversion 
   DDRB = 0b10011111;                  // Reset peak detector
   delayMicroseconds(100);             // guaranteed reset
   DDRB = 0b10011110;
+
+  /*
+  // flush lightning detector
+  while (digitalRead(INT))
+  {
+    delay(2); // minimal delay after stroke interrupt
+
+    Wire.requestFrom((uint8_t)3, (uint8_t)8);    // request 9 bytes from slave device #3
+    for (int8_t reg=0; reg<8; reg++)
+    { 
+      uint8_t ble = Wire.read();    // receive a byte
+    }
+  }
+  */
+
   sbi(ADCSRA, ADIF);        // reset interrupt flag from ADC
 
   uint16_t suppress = 0;      
@@ -330,8 +348,6 @@ void loop()
     #define RANGE 252
     
     for(int n=offset; n<(offset+RANGE); n++)  
-    //!!! for(int n=CHANNELS/2-offset; n<CHANNELS-offset; n++)  
-    //!!! for(int n=0; n<CHANNELS; n++)  
     {
       dataString += String(buffer[n]); 
       //dataString += "\t";
@@ -377,10 +393,12 @@ void loop()
         dataFile.println(dataString);  // write to SDcard (800 ms)     
         //digitalWrite(LED_yellow, LOW);          
         dataFile.close();
-    
-        dataString.remove(100); //!!!DEBUG
+
+#ifdef DEBUG
+        dataString.remove(100); 
+#endif
         digitalWrite(LED_yellow, HIGH);  // Blink for Dasa
-        Serial.println(dataString);  // print to terminal (additional 700 ms)
+        Serial.println(dataString);  // print to terminal (additional 700 ms in DEBUG mode)
         digitalWrite(LED_yellow, LOW);          
       }  
       // if the file isn't open, pop up an error:

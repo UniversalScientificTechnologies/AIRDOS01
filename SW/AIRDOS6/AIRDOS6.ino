@@ -179,13 +179,13 @@ void loop()
     
     // measurement of ADC offset
     ADMUX = (analog_reference << 6) | 0b10001; // Select +A1,-A1 for offset correction
+    delay(50);
     ADCSRB = 0;               // Switching ADC to Free Running mode
     sbi(ADCSRA, ADATE);       // ADC autotrigger enable (mandatory for free running mode)
     sbi(ADCSRA, ADSC);        // ADC start the first conversions
     sbi(ADCSRA, 2);           // 0x100 = clock divided by 16, 62.5 kHz, 208 us for 13 cycles of one AD conversion, 24 us fo 1.5 cycle for sample-hold
     cbi(ADCSRA, 1);        
     cbi(ADCSRA, 0);        
-    while (bit_is_clear(ADCSRA, ADIF)); // wait for the first dummy conversion 
     sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
     while (bit_is_clear(ADCSRA, ADIF)); // wait for the first conversion 
     sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
@@ -203,7 +203,7 @@ void loop()
     // manage negative values
     if (u_sensor <= (CHANNELS/2)-1 ) {u_sensor += (CHANNELS/2);} else {u_sensor -= (CHANNELS/2);}
     offset = u_sensor;
-    
+   
     PORTB = 1;                          // Set reset output for peak detector to H
     while (bit_is_clear(ADCSRA, ADIF)); // wait for the first dummy conversion 
     DDRB = 0b10011111;                  // Reset peak detector
@@ -391,11 +391,11 @@ void loop()
   
         DDRB = 0b10011110;
         PORTB = 0b00000001;  // SDcard Power OFF
-     }  
+      }  
         
 //!!!DEBUG    
 Serial.println(dataString);  // print to terminal (additional 700 ms)
-  } 
+    } 
   }      
   {
       // make a string for assembling the data to log:
