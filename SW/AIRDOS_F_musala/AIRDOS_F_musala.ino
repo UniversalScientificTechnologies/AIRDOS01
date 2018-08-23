@@ -334,7 +334,7 @@ void loop()
     }
 
     // make a string for assembling the data to log:
-    dataString += "$CANDY,";
+    dataString += "$CANDY3,";
 
     dataString += String(count); 
     dataString += ",";
