@@ -155,8 +155,24 @@ void setup()
     delay(50);
     digitalWrite(LED_yellow, LOW);  
   }
-  
+
   Serial.println("#Hmmm...");
+
+  // make a string for device identification output
+  String dataString = "$AIRDOS,F,1,";
+  
+  Wire.beginTransmission(0x58);                   // request SN from EEPROM
+  Wire.write((int)0x08); // MSB
+  Wire.write((int)0); // LSB
+  Wire.endTransmission();
+  Wire.requestFrom((uint8_t)0x58, (uint8_t)16);    
+  uint8_t sn[16];
+  for (int8_t reg=0; reg<16; reg++)
+  { 
+    dataString += String(Wire.read(),HEX);    // receive a byte
+    //Serial.print(sn[reg],HEX);
+  }
+  Serial.println(dataString);
 }
 
 
