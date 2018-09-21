@@ -1,4 +1,5 @@
 //#define DEBUG
+// $Id: $
 /*
   AIRDOS with RTC
  
@@ -166,11 +167,9 @@ void setup()
   Wire.write((int)0); // LSB
   Wire.endTransmission();
   Wire.requestFrom((uint8_t)0x58, (uint8_t)16);    
-  uint8_t sn[16];
   for (int8_t reg=0; reg<16; reg++)
   { 
     dataString += String(Wire.read(),HEX);    // receive a byte
-    //Serial.print(sn[reg],HEX);
   }
   Serial.println(dataString);
 }
