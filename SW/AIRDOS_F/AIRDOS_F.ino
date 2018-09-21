@@ -1,5 +1,5 @@
 //#define DEBUG
-// $Id: $
+// $Id$
 /*
   AIRDOS with RTC
  
