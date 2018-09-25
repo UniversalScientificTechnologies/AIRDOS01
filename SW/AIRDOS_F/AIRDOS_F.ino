@@ -1,5 +1,5 @@
 //#define DEBUG
-// $Id$
+String githash = "$Id$";
 /*
   AIRDOS with RTC
  
@@ -75,6 +75,7 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
 #define CHANNELS 512 // number of channels in buffer for histogram, including negative numbers
 
 uint16_t count = 0;
+uint32_t serialhash = 0;
 
 RTC_Millis rtc;
 
@@ -160,18 +161,58 @@ void setup()
   Serial.println("#Hmmm...");
 
   // make a string for device identification output
-  String dataString = "$AIRDOS,F,1,";
+  String dataString = "$AIRDOS,F," + githash.substring(5,44) + ","; // FW version and Git hash
   
   Wire.beginTransmission(0x58);                   // request SN from EEPROM
   Wire.write((int)0x08); // MSB
-  Wire.write((int)0); // LSB
+  Wire.write((int)0x00); // LSB
   Wire.endTransmission();
   Wire.requestFrom((uint8_t)0x58, (uint8_t)16);    
   for (int8_t reg=0; reg<16; reg++)
   { 
-    dataString += String(Wire.read(),HEX);    // receive a byte
+    uint8_t serialbyte = Wire.read(); // receive a byte
+    if (serialbyte<0x10) dataString += "0";
+    dataString += String(serialbyte,HEX);    
+    serialhash += serialbyte;
   }
-  Serial.println(dataString);
+
+  {
+    DDRB = 0b10111110;
+    PORTB = 0b00001111;  // SDcard Power ON
+  
+    // make sure that the default chip select pin is set to output
+    // see if the card is present and can be initialized:
+    if (!SD.begin(SS)) 
+    {
+      Serial.println("#Card failed, or not present");
+      // don't do anything more:
+      return;
+    }
+  
+    // open the file. note that only one file can be open at a time,
+    // so you have to close this one before opening another.
+    File dataFile = SD.open("datalogg.txt", FILE_WRITE);
+  
+    // if the file is available, write to it:
+    if (dataFile) 
+    {
+      dataFile.println(dataString);  // write to SDcard (800 ms)     
+      dataFile.close();
+  
+      digitalWrite(LED_yellow, HIGH);  // Blink for Dasa
+      Serial.println(dataString);  // print to terminal (additional 700 ms in DEBUG mode)
+      digitalWrite(LED_yellow, LOW);          
+    }  
+    // if the file isn't open, pop up an error:
+    else 
+    {
+      Serial.println("#error opening datalog.txt");
+    }
+  
+    DDRB = 0b10011110;
+    PORTB = 0b00000001;  // SDcard Power OFF          
+  }    
+
 }
 
 
@@ -399,7 +440,7 @@ void loop()
 
       // open the file. note that only one file can be open at a time,
       // so you have to close this one before opening another.
-      File dataFile = SD.open("datalog.txt", FILE_WRITE);
+      File dataFile = SD.open("datalogg.txt", FILE_WRITE);
     
       // if the file is available, write to it:
       if (dataFile) 
