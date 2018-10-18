@@ -1,4 +1,4 @@
-//#define DEBUG
+#define NODEBUG
 String githash = "$Id$";
 /*
   AIRDOS with RTC
@@ -200,7 +200,7 @@ void setup()
       dataFile.close();
   
       digitalWrite(LED_yellow, HIGH);  // Blink for Dasa
-      Serial.println(dataString);  // print to terminal (additional 700 ms in DEBUG mode)
+      Serial.println(dataString);  // print SN to terminal 
       digitalWrite(LED_yellow, LOW);          
     }  
     // if the file isn't open, pop up an error:
@@ -265,15 +265,31 @@ void loop()
   sbi(ADCSRA, ADIF);        // reset interrupt flag from ADC
 
   uint16_t suppress = 0;      
-  uint8_t strokes = 0;  
-  uint8_t lightning[10][8];
     
+  while (bit_is_clear(ADCSRA, ADIF)); // wait for dummy conversion 
+  DDRB = 0b10011111;                  // Reset peak detector
+  asm("NOP");                         // cca 6 us for 2k2 resistor and 1k capacitor in peak detector
+  asm("NOP");                         
+  asm("NOP");                         
+  asm("NOP");                         
+  asm("NOP");                         
+  DDRB = 0b10011110;
+  sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
+  
   // dosimeter integration
-  for (uint8_t i=0; i<10; i++)    // cca 10 s
+  for (uint16_t i=0; i<46000; i++)    // cca 10 s
   {
-    while (bit_is_clear(ADCSRA, ADIF)); // wait for dummy conversion 
+    while (bit_is_clear(ADCSRA, ADIF)); // wait for end of conversion 
+    //delayMicroseconds(24);            // 24 us wait for 1.5 cycle of 62.5 kHz ADC clock for sample/hold for next conversion
+    asm("NOP");                         // cca 8 us after loop
+    asm("NOP");                         
+    asm("NOP");                         
+    asm("NOP");                         
+    asm("NOP");                         
+    asm("NOP");                         
+    
     DDRB = 0b10011111;                  // Reset peak detector
-    asm("NOP");                         // cca 6 us for 2k2 resistor and 1k capacitor in peak detector
+    asm("NOP");                         // cca 7 us for 2k2 resistor and 100n capacitor in peak detector
     asm("NOP");                         
     asm("NOP");                         
     asm("NOP");                         
@@ -281,50 +297,29 @@ void loop()
     DDRB = 0b10011110;
     sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
 
-    for (uint16_t n=0; n<4600; n++) // cca 1 s
-    {      
-      while (bit_is_clear(ADCSRA, ADIF)); // wait for end of conversion 
-      //delayMicroseconds(24);            // 24 us wait for 1.5 cycle of 62.5 kHz ADC clock for sample/hold for next conversion
-      asm("NOP");                         // cca 8 us after loop
-      asm("NOP");                         
-      asm("NOP");                         
-      asm("NOP");                         
-      asm("NOP");                         
-      asm("NOP");                         
-      
-      DDRB = 0b10011111;                  // Reset peak detector
-      asm("NOP");                         // cca 7 us for 2k2 resistor and 100n capacitor in peak detector
-      asm("NOP");                         
-      asm("NOP");                         
-      asm("NOP");                         
-      asm("NOP");                         
-      DDRB = 0b10011110;
-      sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
-  
-      // we have to read ADCL first; doing so locks both ADCL
-      // and ADCH until ADCH is read.  reading ADCL second would
-      // cause the results of each conversion to be discarded,
-      // as ADCL and ADCH would be locked when it completed.
-      lo = ADCL;
-      hi = ADCH;
-  
-      // combine the two bytes
-      u_sensor = (hi << 7) | (lo >> 1);
-  
-      // manage negative values
-      if (u_sensor <= (CHANNELS/2)-1 ) {u_sensor += (CHANNELS/2);} else {u_sensor -= (CHANNELS/2);}
-                
-      if (u_sensor > maximum) // filter double detection for pulses between two samples
-      {
-        maximum = u_sensor;
-        suppress++;
-      }
-      else
-      {
-        buffer[maximum]++;
-        maximum = 0;
-      }
-    }    
+    // we have to read ADCL first; doing so locks both ADCL
+    // and ADCH until ADCH is read.  reading ADCL second would
+    // cause the results of each conversion to be discarded,
+    // as ADCL and ADCH would be locked when it completed.
+    lo = ADCL;
+    hi = ADCH;
+
+    // combine the two bytes
+    u_sensor = (hi << 7) | (lo >> 1);
+
+    // manage negative values
+    if (u_sensor <= (CHANNELS/2)-1 ) {u_sensor += (CHANNELS/2);} else {u_sensor -= (CHANNELS/2);}
+              
+    if (u_sensor > maximum) // filter double detection for pulses between two samples
+    {
+      maximum = u_sensor;
+      suppress++;
+    }
+    else
+    {
+      buffer[maximum]++;
+      maximum = 0;
+    }
   }  
   
   // Data out
@@ -392,13 +387,6 @@ void loop()
         dataFile.println(dataString);  // write to SDcard (800 ms)     
         //digitalWrite(LED_yellow, LOW);          
         dataFile.close();
-
-#ifdef DEBUG
-        dataString.remove(100); 
-#endif
-        digitalWrite(LED_yellow, HIGH);  // Blink for Dasa
-        Serial.println(dataString);  // print to terminal (additional 700 ms in DEBUG mode)
-        digitalWrite(LED_yellow, LOW);          
       }  
       // if the file isn't open, pop up an error:
       else 
@@ -408,6 +396,13 @@ void loop()
 
       DDRB = 0b10011110;
       PORTB = 0b00000001;  // SDcard Power OFF
+
+#ifdef NODEBUG
+      dataString.remove(75); 
+#endif
+      digitalWrite(LED_yellow, HIGH);  // Blink for Dasa
+      Serial.println(dataString);  // print to terminal (additional 700 ms in DEBUG mode)
+      digitalWrite(LED_yellow, LOW);          
     }          
   }    
 }
