@@ -161,7 +161,7 @@ void setup()
   Serial.println("#Hmmm...");
 
   // make a string for device identification output
-  String dataString = "$AIRDOS,F," + githash.substring(5,44) + ","; // FW version and Git hash
+  String dataString = "$AIRDOS,F," + githash.substring(5,45) + ","; // FW version and Git hash
   
   Wire.beginTransmission(0x58);                   // request SN from EEPROM
   Wire.write((int)0x08); // MSB
