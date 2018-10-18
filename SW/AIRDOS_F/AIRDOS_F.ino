@@ -191,7 +191,7 @@ void setup()
   
     // open the file. note that only one file can be open at a time,
     // so you have to close this one before opening another.
-    File dataFile = SD.open("datalogg.txt", FILE_WRITE);
+    File dataFile = SD.open("datalog.txt", FILE_WRITE);
   
     // if the file is available, write to it:
     if (dataFile) 
@@ -262,20 +262,6 @@ void loop()
   delayMicroseconds(100);             // guaranteed reset
   DDRB = 0b10011110;
 
-  /*
-  // flush lightning detector
-  while (digitalRead(INT))
-  {
-    delay(2); // minimal delay after stroke interrupt
-
-    Wire.requestFrom((uint8_t)3, (uint8_t)8);    // request 9 bytes from slave device #3
-    for (int8_t reg=0; reg<8; reg++)
-    { 
-      uint8_t ble = Wire.read();    // receive a byte
-    }
-  }
-  */
-
   sbi(ADCSRA, ADIF);        // reset interrupt flag from ADC
 
   uint16_t suppress = 0;      
@@ -338,20 +324,7 @@ void loop()
         buffer[maximum]++;
         maximum = 0;
       }
-    }
-    
-    if (digitalRead(INT))
-    {
-      delay(2); // minimal delay after stroke interrupt
-
-      Wire.requestFrom((uint8_t)3, (uint8_t)8);    // request 9 bytes from slave device #3
-
-      for (int8_t reg=0; reg<8; reg++)
-      { 
-        lightning[strokes][reg] = Wire.read();    // receive a byte
-      }
-      lightning[strokes++][0] = i;
-    }
+    }    
   }  
   
   // Data out
@@ -360,34 +333,6 @@ void loop()
 
     // make a string for assembling the data to log:
     String dataString = "";
-
-    for(int n=0; n<strokes; n++)  
-    {
-      uint32_t stroke, stroke_energy;
-  
-      dataString += "$STROKE,";
-
-      dataString += String(count); 
-      dataString += ",";
-
-      dataString += String(now.unixtime() - (9 - lightning[n][0]));  // Time of discharge
-      dataString += ",";
-
-      dataString += String(lightning[n][3]);  // Type of discharge
-      dataString += ",";
-
-      stroke_energy = lightning[n][4];
-      stroke = lightning[n][5];
-      stroke_energy += stroke << 8;
-      stroke = lightning[n][6] & 0b11111;
-      stroke_energy += stroke << 16;
-  
-      dataString += String(stroke_energy);  // Energy of single stroke
-      dataString += ",";
-    
-      dataString += String(lightning[n][7] & 0b111111);  // Distance from storm
-      dataString += "\r\n";
-    }
 
     // make a string for assembling the data to log:
     dataString += "$CANDY,";
@@ -398,8 +343,7 @@ void loop()
     dataString += String(now.unixtime()); 
     dataString += ",";
 
-
-    uint16_t noise = offset+6;
+    uint16_t noise = offset+3;
     uint32_t dose=0;
     #define RANGE 252
     
@@ -410,7 +354,6 @@ void loop()
       dataString += ",";
       //if (n==NOISE) dataString += "*,";
     }
-
     
     for(int n=noise; n<(offset+RANGE); n++)  
     {
@@ -440,7 +383,7 @@ void loop()
 
       // open the file. note that only one file can be open at a time,
       // so you have to close this one before opening another.
-      File dataFile = SD.open("datalogg.txt", FILE_WRITE);
+      File dataFile = SD.open("datalog.txt", FILE_WRITE);
     
       // if the file is available, write to it:
       if (dataFile) 
