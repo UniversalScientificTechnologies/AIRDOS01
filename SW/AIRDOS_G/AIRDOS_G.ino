@@ -1,4 +1,4 @@
-//#define NODEBUG // Please comment it in debug mode
+#define DEBUG // Please comment it if you are not debugging
 String githash = "$Id: 2a1c18d43c3937e40a3beb6c2855589b2d1a19e9 $";
 /*
   AIRDOS02A (RTC, GPS)
@@ -73,7 +73,8 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
 #define SCK       7    // PB7
 #define INT       20   // PC4
 
-#define CHANNELS 512 // number of channels in buffer for histogram, including negative numbers
+#define CHANNELS 512  // number of channels in buffer for histogram, including negative numbers
+#define TRESHOLD 3    // ionising radiation flux treshold
 
 uint16_t count = 0;
 uint32_t serialhash = 0;
@@ -220,192 +221,201 @@ void loop()
   uint8_t lo, hi;
   uint16_t u_sensor, maximum;
   uint16_t buffer[CHANNELS];
-  uint16_t offset;
-  
-  for(int n=0; n<CHANNELS; n++)
+  uint16_t offset, old_offset = 0;
+  uint32_t flux;
+
+  for(int i=0; i<(30); i++)  // 30 measurements between GPS aquisition
   {
-    buffer[n]=0;
-  }
-
-  // measurement of ADC offset
-  ADMUX = (analog_reference << 6) | 0b10001; // Select +A1,-A1 for offset correction
-  delay(50);
-  ADCSRB = 0;               // Switching ADC to Free Running mode
-  sbi(ADCSRA, ADATE);       // ADC autotrigger enable (mandatory for free running mode)
-  sbi(ADCSRA, ADSC);        // ADC start the first conversions
-  sbi(ADCSRA, 2);           // 0x100 = clock divided by 16, 62.5 kHz, 208 us for 13 cycles of one AD conversion, 24 us fo 1.5 cycle for sample-hold
-  cbi(ADCSRA, 1);        
-  cbi(ADCSRA, 0);        
-  sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
-  while (bit_is_clear(ADCSRA, ADIF)); // wait for the first conversion 
-  sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
-  lo = ADCL;
-  hi = ADCH;
-  ADMUX = (analog_reference << 6) | 0b10000; // Select +A0,-A1 for measurement
-  ADCSRB = 0;               // Switching ADC to Free Running mode
-  sbi(ADCSRA, ADATE);       // ADC autotrigger enable (mandatory for free running mode)
-  sbi(ADCSRA, ADSC);        // ADC start the first conversions
-  sbi(ADCSRA, 2);           // 0x100 = clock divided by 16, 62.5 kHz, 208 us for 13 cycles of one AD conversion, 24 us fo 1.5 cycle for sample-hold
-  cbi(ADCSRA, 1);        
-  cbi(ADCSRA, 0);        
-  // combine the two bytes
-  u_sensor = (hi << 7) | (lo >> 1);
-  // manage negative values
-  if (u_sensor <= (CHANNELS/2)-1 ) {u_sensor += (CHANNELS/2);} else {u_sensor -= (CHANNELS/2);}
-  offset = u_sensor;
+    for(int n=0; n<CHANNELS; n++)
+    {
+      buffer[n]=0;
+    }
   
-  PORTB = 1;                          // Set reset output for peak detector to H
-  sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
-  while (bit_is_clear(ADCSRA, ADIF)); // wait for the first dummy conversion 
-  DDRB = 0b10011111;                  // Reset peak detector
-  delayMicroseconds(100);             // guaranteed reset
-  DDRB = 0b10011110;
-
-  sbi(ADCSRA, ADIF);        // reset interrupt flag from ADC
-
-  uint16_t suppress = 0;      
+    // measurement of ADC offset
+    ADMUX = (analog_reference << 6) | 0b10001; // Select +A1,-A1 for offset correction
+    delay(50);
+    ADCSRB = 0;               // Switching ADC to Free Running mode
+    sbi(ADCSRA, ADATE);       // ADC autotrigger enable (mandatory for free running mode)
+    sbi(ADCSRA, ADSC);        // ADC start the first conversions
+    sbi(ADCSRA, 2);           // 0x100 = clock divided by 16, 62.5 kHz, 208 us for 13 cycles of one AD conversion, 24 us fo 1.5 cycle for sample-hold
+    cbi(ADCSRA, 1);        
+    cbi(ADCSRA, 0);        
+    sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
+    while (bit_is_clear(ADCSRA, ADIF)); // wait for the first conversion 
+    sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
+    lo = ADCL;
+    hi = ADCH;
+    ADMUX = (analog_reference << 6) | 0b10000; // Select +A0,-A1 for measurement
+    ADCSRB = 0;               // Switching ADC to Free Running mode
+    sbi(ADCSRA, ADATE);       // ADC autotrigger enable (mandatory for free running mode)
+    sbi(ADCSRA, ADSC);        // ADC start the first conversions
+    sbi(ADCSRA, 2);           // 0x100 = clock divided by 16, 62.5 kHz, 208 us for 13 cycles of one AD conversion, 24 us fo 1.5 cycle for sample-hold
+    cbi(ADCSRA, 1);        
+    cbi(ADCSRA, 0);        
+    // combine the two bytes
+    u_sensor = (hi << 7) | (lo >> 1);
+    // manage negative values
+    if (u_sensor <= (CHANNELS/2)-1 ) {u_sensor += (CHANNELS/2);} else {u_sensor -= (CHANNELS/2);}
+    if (1 < abs(old_offset - u_sensor)) offset = u_sensor;
+    old_offset = offset;
     
-  while (bit_is_clear(ADCSRA, ADIF)); // wait for dummy conversion 
-  DDRB = 0b10011111;                  // Reset peak detector
-  asm("NOP");                         // cca 6 us for 2k2 resistor and 1k capacitor in peak detector
-  asm("NOP");                         
-  asm("NOP");                         
-  asm("NOP");                         
-  asm("NOP");                         
-  DDRB = 0b10011110;
-  sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
-  
-  // dosimeter integration
-  for (uint16_t i=0; i<46000; i++)    // cca 10 s
-  {
-    while (bit_is_clear(ADCSRA, ADIF)); // wait for end of conversion 
-    //delayMicroseconds(24);            // 24 us wait for 1.5 cycle of 62.5 kHz ADC clock for sample/hold for next conversion
-    asm("NOP");                         // cca 8 us after loop
-    asm("NOP");                         
-    asm("NOP");                         
-    asm("NOP");                         
-    asm("NOP");                         
-    asm("NOP");                         
-    
+    PORTB = 1;                          // Set reset output for peak detector to H
+    sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
+    while (bit_is_clear(ADCSRA, ADIF)); // wait for the first dummy conversion 
     DDRB = 0b10011111;                  // Reset peak detector
-    asm("NOP");                         // cca 7 us for 2k2 resistor and 100n capacitor in peak detector
+    delayMicroseconds(100);             // guaranteed reset
+    DDRB = 0b10011110;
+  
+    sbi(ADCSRA, ADIF);        // reset interrupt flag from ADC
+  
+    uint16_t suppress = 0;      
+      
+    while (bit_is_clear(ADCSRA, ADIF)); // wait for dummy conversion 
+    DDRB = 0b10011111;                  // Reset peak detector
+    asm("NOP");                         // cca 6 us for 2k2 resistor and 1k capacitor in peak detector
     asm("NOP");                         
     asm("NOP");                         
     asm("NOP");                         
     asm("NOP");                         
     DDRB = 0b10011110;
     sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
-
-    // we have to read ADCL first; doing so locks both ADCL
-    // and ADCH until ADCH is read.  reading ADCL second would
-    // cause the results of each conversion to be discarded,
-    // as ADCL and ADCH would be locked when it completed.
-    lo = ADCL;
-    hi = ADCH;
-
-    // combine the two bytes
-    u_sensor = (hi << 7) | (lo >> 1);
-
-    // manage negative values
-    if (u_sensor <= (CHANNELS/2)-1 ) {u_sensor += (CHANNELS/2);} else {u_sensor -= (CHANNELS/2);}
-              
-    if (u_sensor > maximum) // filter double detection for pulses between two samples
-    {
-      maximum = u_sensor;
-      suppress++;
-    }
-    else
-    {
-      buffer[maximum]++;
-      maximum = 0;
-    }
-  }  
-  
-  // Data out
-  {
-    DateTime now = rtc.now();
-
-    // make a string for assembling the data to log:
-    String dataString = "";
-
-    // make a string for assembling the data to log:
-    dataString += "$CANDY,";
-
-    dataString += String(count); 
-    dataString += ",";
-  
-    dataString += String(now.unixtime()); 
-    dataString += ",";
-
-    uint16_t noise = offset+3;
-    uint32_t dose=0;
-    #define RANGE 252
     
-    for(int n=offset; n<(offset+RANGE); n++)  
+    // dosimeter integration
+    for (uint16_t i=0; i<46000; i++)    // cca 10 s
     {
-      dataString += String(buffer[n]); 
-      //dataString += "\t";
-      dataString += ",";
-      //if (n==NOISE) dataString += "*,";
-    }
-    
-    for(int n=noise; n<(offset+RANGE); n++)  
-    {
-      dose += buffer[n]; 
-    }
-
-    dataString += String(suppress);
-    dataString += ",";
-    dataString += String(dose);
-    dataString += ",";
-    dataString += String(offset);
-
-    count++;
-
-    {
-      DDRB = 0b10111110;
-      PORTB = 0b00001111;  // SDcard Power ON
-
-      // make sure that the default chip select pin is set to output
-      // see if the card is present and can be initialized:
-      if (!SD.begin(SS)) 
-      {
-        Serial.println("#Card failed, or not present");
-        // don't do anything more:
-        return;
-      }
-
-      // open the file. note that only one file can be open at a time,
-      // so you have to close this one before opening another.
-      File dataFile = SD.open("datalog.txt", FILE_WRITE);
-    
-      // if the file is available, write to it:
-      if (dataFile) 
-      {
-        //digitalWrite(LED_red, HIGH);  // Blink for Dasa
-        dataFile.println(dataString);  // write to SDcard (800 ms)     
-        //digitalWrite(LED_red, LOW);          
-        dataFile.close();
-      }  
-      // if the file isn't open, pop up an error:
-      else 
-      {
-        Serial.println("#error opening datalog.txt");
-      }
-
+      while (bit_is_clear(ADCSRA, ADIF)); // wait for end of conversion 
+      //delayMicroseconds(24);            // 24 us wait for 1.5 cycle of 62.5 kHz ADC clock for sample/hold for next conversion
+      asm("NOP");                         // cca 8 us after loop
+      asm("NOP");                         
+      asm("NOP");                         
+      asm("NOP");                         
+      asm("NOP");                         
+      asm("NOP");                         
+      
+      DDRB = 0b10011111;                  // Reset peak detector
+      asm("NOP");                         // cca 7 us for 2k2 resistor and 100n capacitor in peak detector
+      asm("NOP");                         
+      asm("NOP");                         
+      asm("NOP");                         
+      asm("NOP");                         
       DDRB = 0b10011110;
-      PORTB = 0b00000001;  // SDcard Power OFF
+      sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
+  
+      // we have to read ADCL first; doing so locks both ADCL
+      // and ADCH until ADCH is read.  reading ADCL second would
+      // cause the results of each conversion to be discarded,
+      // as ADCL and ADCH would be locked when it completed.
+      lo = ADCL;
+      hi = ADCH;
+  
+      // combine the two bytes
+      u_sensor = (hi << 7) | (lo >> 1);
+  
+      // manage negative values
+      if (u_sensor <= (CHANNELS/2)-1 ) {u_sensor += (CHANNELS/2);} else {u_sensor -= (CHANNELS/2);}
+                
+      if (u_sensor > maximum) // filter double detection for pulses between two samples
+      {
+        maximum = u_sensor;
+        suppress++;
+      }
+      else
+      {
+        buffer[maximum]++;
+        maximum = 0;
+      }
+    }  
+    
+    // Data out
+    flux = 0;
+    {
+      DateTime now = rtc.now();
+  
+      // make a string for assembling the data to log:
+      String dataString = "";
+  
+      // make a string for assembling the data to log:
+      dataString += "$CANDY,";
+  
+      dataString += String(count); 
+      dataString += ",";
+    
+      dataString += String(now.unixtime()); 
+      dataString += ",";
+  
+      uint16_t noise = offset+4; // first channel for flux calculation
+      #define RANGE 252
+      
+      for(int n=offset; n<(offset+RANGE); n++)  
+      {
+        dataString += String(buffer[n]); 
+        //dataString += "\t";
+        dataString += ",";
+        //if (n==NOISE) dataString += "*,";
+      }
+      
+      for(int n=noise; n<(offset+RANGE); n++)  
+      {
+        flux += buffer[n]; 
+      }
+  
+      dataString += String(suppress);
+      dataString += ",";
+      dataString += String(flux);
+      dataString += ",";
+      dataString += String(offset);
+  
+      count++;
+         
+     if (flux>TRESHOLD)
+     {
+        DDRB = 0b10111110;
+        PORTB = 0b00001111;  // SDcard Power ON
+  
+        // make sure that the default chip select pin is set to output
+        // see if the card is present and can be initialized:
+        if (!SD.begin(SS)) 
+        {
+          Serial.println("#Card failed, or not present");
+          // don't do anything more:
+          return;
+        }
+  
+        // open the file. note that only one file can be open at a time,
+        // so you have to close this one before opening another.
+        File dataFile = SD.open("datalog.txt", FILE_WRITE);
+      
+        // if the file is available, write to it:
+        if (dataFile) 
+        {
+          digitalWrite(LED_red, HIGH);  // Blink for Dasa
+          dataFile.println(dataString);  // write to SDcard (800 ms)     
+          digitalWrite(LED_red, LOW);          
+          dataFile.close();
+        }  
+        // if the file isn't open, pop up an error:
+        else 
+        {
+          Serial.println("#error opening datalog.txt");
+        }
+  
+        DDRB = 0b10011110;
+        PORTB = 0b00000001;  // SDcard Power OFF  
+      }          
 
-#ifdef NODEBUG
+#ifdef DEBUG
+#else
       dataString.remove(75); 
 #endif
-      digitalWrite(LED_red, HIGH);  // Blink for Dasa
-      Serial.println(dataString);  // print to terminal (additional 700 ms in DEBUG mode)
-      digitalWrite(LED_red, LOW);          
-    }          
-  }    
 
+      digitalWrite(LED_red, HIGH);  // Blink for Dasa
+      Serial.println(dataString);   // print to terminal (additional 700 ms in DEBUG mode)
+      digitalWrite(LED_red, LOW);                
+    }    
+  }
+  
   // GPS **********************
+  if (flux>TRESHOLD)
   {
       // make a string for assembling the data to log:
       String dataString = "";
@@ -503,10 +513,9 @@ void loop()
         DDRB = 0b10011110;
         PORTB = 0b00000001;  // SDcard Power OFF
     }  
-  
-//!!!DEBUG    
-Serial.print(dataString);  // print to terminal (additional 700 ms)
-
+#ifdef DEBUG
+    Serial.print(dataString);  // print to terminal (additional 700 ms)
+#endif
   }
 }
 
