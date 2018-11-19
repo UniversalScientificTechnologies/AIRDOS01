@@ -3,8 +3,6 @@ String githash = "$Id: 2a1c18d43c3937e40a3beb6c2855589b2d1a19e9 $";
 /*
   AIRDOS02A (RTC, GPS)
  
-Compiled with: Arduino 1.8.5
-
 3 month endurance with LS 33600 = 7.6 mA
 
 ISP
@@ -56,7 +54,9 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
                       +--------+
 */
 
-#include <SD.h>             // Tested with version 1.2.2.
+// Compiled with: Arduino 1.8.5
+// MightyCore 2.0.1 https://mcudude.github.io/MightyCore/package_MCUdude_MightyCore_index.json
+#include <SD.h>             // Tested with version 1.0.7. (MightyCore)
 #include "wiring_private.h"
 #include <Wire.h>           // Tested with version 1.0.0.
 #include "RTClib.h"         // Tested with version 1.5.4. (NeiroN)
