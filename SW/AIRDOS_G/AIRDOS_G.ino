@@ -59,7 +59,7 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
 #include <SD.h>             // Tested with version 1.2.2.
 #include "wiring_private.h"
 #include <Wire.h>           // Tested with version 1.0.0.
-#include "RTClib.h"         // Tested with version 1.5.4.
+#include "RTClib.h"         // Tested with version 1.5.4. (NeiroN)
 
 #define LED_red  23 // PC7
 #define RESET     0    // PB0
