@@ -343,7 +343,7 @@ void loop()
       dataString += String(now.unixtime()); 
       dataString += ",";
   
-      uint16_t noise = offset+4; // first channel for flux calculation
+      uint16_t noise = offset+3; // first channel for flux calculation
       #define RANGE 252
       
       for(int n=offset; n<(offset+RANGE); n++)  
