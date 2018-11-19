@@ -74,7 +74,7 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
 #define INT       20   // PC4
 
 #define CHANNELS 512  // number of channels in buffer for histogram, including negative numbers
-#define TRESHOLD 3    // ionising radiation flux treshold
+#define TRESHOLD 4    // ionising radiation flux treshold
 
 uint16_t count = 0;
 uint32_t serialhash = 0;
