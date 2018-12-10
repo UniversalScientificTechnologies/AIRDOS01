@@ -73,8 +73,10 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
 #define SCK       7    // PB7
 #define INT       20   // PC4
 
-#define CHANNELS 512  // number of channels in buffer for histogram, including negative numbers
-#define TRESHOLD 4    // ionising radiation flux treshold
+#define CHANNELS 512   // number of channels in buffer for histogram, including negative numbers
+#define GPSerror 70000 // number of cycles for waitig for GPS in case of GPS error 
+#define GPSdelay 10    // number of measurements beteen obtaining GPS position
+#define TRESHOLD 3*GPSdelay  // ionising radiation flux treshold for obtaining GPS position
 
 uint16_t count = 0;
 uint32_t serialhash = 0;
@@ -224,7 +226,9 @@ void loop()
   uint16_t offset, old_offset = 0;
   uint32_t flux;
 
-  for(int i=0; i<(30); i++)  // 30 measurements between GPS aquisition
+  uint32_t flux_long = 0;
+
+  for(int i=0; i<(GPSdelay); i++)  // measurements between GPS aquisition
   {
     for(int n=0; n<CHANNELS; n++)
     {
@@ -366,8 +370,10 @@ void loop()
       dataString += String(offset);
   
       count++;
+
+      flux_long = flux_long + flux;
          
-     if (flux>TRESHOLD)
+     //if (flux>TRESHOLD)
      {
         DDRB = 0b10111110;
         PORTB = 0b00001111;  // SDcard Power ON
@@ -388,9 +394,9 @@ void loop()
         // if the file is available, write to it:
         if (dataFile) 
         {
-          digitalWrite(LED_red, HIGH);  // Blink for Dasa
+          //digitalWrite(LED_red, HIGH);  // Blink for Dasa
           dataFile.println(dataString);  // write to SDcard (800 ms)     
-          digitalWrite(LED_red, LOW);          
+          //digitalWrite(LED_red, LOW);          
           dataFile.close();
         }  
         // if the file isn't open, pop up an error:
@@ -415,7 +421,7 @@ void loop()
   }
   
   // GPS **********************
-  if (flux>TRESHOLD)
+  if (flux_long>TRESHOLD)
   {
       // make a string for assembling the data to log:
       String dataString = "";
@@ -440,6 +446,7 @@ void loop()
     boolean flag = false;
     char incomingByte; 
     int messages = 0;
+    uint32_t nomessages = 0;
 
     while(true)
     {
@@ -447,15 +454,21 @@ void loop()
       {
         // read the incoming byte:
         incomingByte = Serial.read();
-
+        nomessages = 0;
+        
         if (incomingByte == '$') {messages++;}; // Prevent endless waiting
-        if (messages > 256) break; // cca 26 s
+        if (messages > 300) break; // more than 26 s
 
         if (flag && (incomingByte == '*')) break;
         flag = false;
 
         if (incomingByte == 'A') flag = true;   // Waiting for FIX
-      }     
+      }
+      else
+      {
+        nomessages++;  
+        if (nomessages > GPSerror) break; // preventing of forever waiting
+      }
     }
     
     // make a string for assembling the NMEA to log:
@@ -463,18 +476,25 @@ void loop()
 
     flag = false;
     messages = 0;
+    nomessages = 0;
     while(true)
     {
       if (Serial.available()) 
       {
         // read the incoming byte:
         incomingByte = Serial.read();
+        nomessages = 0;
         
         if (incomingByte == '$') {flag = true; messages++;};
         if (messages > MSG_NO) break;
         
         // say what you got:
         if (flag && (messages<=MSG_NO)) dataString+=incomingByte;
+      }
+      else
+      {
+        nomessages++;  
+        if (nomessages > GPSerror) break; // preventing of forever waiting
       }
     }
     digitalWrite(GPSpower, LOW); // GPS Power OFF
