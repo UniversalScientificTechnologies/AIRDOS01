@@ -75,7 +75,7 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
 
 #define CHANNELS 512   // number of channels in buffer for histogram, including negative numbers
 #define GPSerror 70000 // number of cycles for waitig for GPS in case of GPS error 
-#define GPSdelay 50    // number of measurements between obtaining GPS position
+#define GPSdelay 10    // number of measurements beteen obtaining GPS position
 #define TRESHOLD 3*GPSdelay  // ionising radiation flux treshold for obtaining GPS position
 
 uint16_t count = 0;
@@ -164,15 +164,17 @@ void setup()
 
   // make a string for device identification output
   String dataString = "$AIRDOS,G," + githash.substring(5,45) + ","; // FW version and Git hash
-  
+
+/*!!!  
   Wire.beginTransmission(0x58);                   // request SN from EEPROM
   Wire.write((int)0x08); // MSB
   Wire.write((int)0x00); // LSB
   Wire.endTransmission();
-  Wire.requestFrom((uint8_t)0x58, (uint8_t)16);    
+  Wire.requestFrom((uint8_t)0x58, (uint8_t)16); 
+*/   
   for (int8_t reg=0; reg<16; reg++)
   { 
-    uint8_t serialbyte = Wire.read(); // receive a byte
+    uint8_t serialbyte = 0xFF; //!!!  Wire.read(); // receive a byte
     if (serialbyte<0x10) dataString += "0";
     dataString += String(serialbyte,HEX);    
     serialhash += serialbyte;
