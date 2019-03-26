@@ -1,4 +1,4 @@
-#define DEBUG // Please comment it if you are not debugging
+//#define DEBUG // Please comment it if you are not debugging
 String githash = "$Id: 2a1c18d43c3937e40a3beb6c2855589b2d1a19e9 $";
 /*
   AIRDOS02A (RTC, GPS)
@@ -347,7 +347,7 @@ void loop()
       dataString += String(now.unixtime()); 
       dataString += ",";
   
-      uint16_t noise = offset+3; // first channel for flux calculation
+      uint16_t noise = offset+4; // first channel for flux calculation
       #define RANGE 252
       
       for(int n=offset; n<(offset+RANGE); n++)  

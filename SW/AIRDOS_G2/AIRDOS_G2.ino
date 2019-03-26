@@ -1,7 +1,7 @@
-#define DEBUG // Please comment it if you are not debugging
+//#define DEBUG // Please comment it if you are not debugging
 String githash = "$Id: 2a1c18d43c3937e40a3beb6c2855589b2d1a19e9 $";
 /*
-  AIRDOS02A (RTC, GPS)
+  AIRDOS02A (RTC, GPS) for tandem with AIRDOS C
  
 3 month endurance with LS 33600 = 7.6 mA
 
@@ -64,6 +64,8 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
 #define LED_red  23 // PC7
 #define RESET     0    // PB0
 #define GPSpower  26   // PA2
+#define SYNC      18   // PC2
+#define SYNC2     19   // PC3
 #define SDpower1  1    // PB1
 #define SDpower2  2    // PB2
 #define SDpower3  3    // PB3
@@ -75,11 +77,14 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
 
 #define CHANNELS 512   // number of channels in buffer for histogram, including negative numbers
 #define GPSerror 70000 // number of cycles for waitig for GPS in case of GPS error 
-#define GPSdelay 10    // number of measurements beteen obtaining GPS position
+#define GPSdelay 50    // number of measurements between obtaining GPS position
 #define TRESHOLD 3*GPSdelay  // ionising radiation flux treshold for obtaining GPS position
 
 uint16_t count = 0;
 uint32_t serialhash = 0;
+uint16_t offset, base_offset;
+uint8_t lo, hi;
+uint16_t u_sensor, maximum;
 
 RTC_Millis rtc;
 
@@ -103,7 +108,7 @@ RTC_Millis rtc;
 //  14  | A14     | A9      | 1x
 //  15  | A15     | A9      | 1x
 #define PIN 0
-uint8_t analog_reference = EXTERNAL; // DEFAULT, INTERNAL, INTERNAL1V1, INTERNAL2V56, or EXTERNAL
+uint8_t analog_reference = INTERNAL2V56; // DEFAULT, INTERNAL, INTERNAL1V1, INTERNAL2V56, or EXTERNAL
 
 void setup()
 {
@@ -149,6 +154,7 @@ void setup()
   pinMode(LED_red, OUTPUT);
   digitalWrite(LED_red, LOW);  
   digitalWrite(RESET, LOW);  
+  digitalWrite(SYNC, LOW);  
   
   //!!! Wire.setClock(100000);
 
@@ -164,17 +170,15 @@ void setup()
 
   // make a string for device identification output
   String dataString = "$AIRDOS,G," + githash.substring(5,45) + ","; // FW version and Git hash
-
-/*!!!  
+  
   Wire.beginTransmission(0x58);                   // request SN from EEPROM
   Wire.write((int)0x08); // MSB
   Wire.write((int)0x00); // LSB
   Wire.endTransmission();
-  Wire.requestFrom((uint8_t)0x58, (uint8_t)16); 
-*/   
+  Wire.requestFrom((uint8_t)0x58, (uint8_t)16);    
   for (int8_t reg=0; reg<16; reg++)
   { 
-    uint8_t serialbyte = 0xFF; //!!!  Wire.read(); // receive a byte
+    uint8_t serialbyte = Wire.read(); // receive a byte
     if (serialbyte<0x10) dataString += "0";
     dataString += String(serialbyte,HEX);    
     serialhash += serialbyte;
@@ -217,24 +221,53 @@ void setup()
     PORTB = 0b00000001;  // SDcard Power OFF          
   }    
 
+  // measurement of ADC offset
+  ADMUX = (analog_reference << 6) | 0b10001; // Select +A1,-A1 for offset correction
+  delay(200);
+  ADCSRB = 0;               // Switching ADC to Free Running mode
+  sbi(ADCSRA, ADATE);       // ADC autotrigger enable (mandatory for free running mode)
+  sbi(ADCSRA, ADSC);        // ADC start the first conversions
+  sbi(ADCSRA, 2);           // 0x100 = clock divided by 16, 62.5 kHz, 208 us for 13 cycles of one AD conversion, 24 us fo 1.5 cycle for sample-hold
+  cbi(ADCSRA, 1);
+  cbi(ADCSRA, 0);
+  sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
+  while (bit_is_clear(ADCSRA, ADIF)); // wait for the first conversion
+  sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
+  lo = ADCL;
+  hi = ADCH;
+  ADMUX = (analog_reference << 6) | 0b10000; // Select +A0,-A1 for measurement
+  ADCSRB = 0;               // Switching ADC to Free Running mode
+  sbi(ADCSRA, ADATE);       // ADC autotrigger enable (mandatory for free running mode)
+  sbi(ADCSRA, ADSC);        // ADC start the first conversions
+  sbi(ADCSRA, 2);           // 0x100 = clock divided by 16, 62.5 kHz, 208 us for 13 cycles of one AD conversion, 24 us fo 1.5 cycle for sample-hold
+  cbi(ADCSRA, 1);
+  cbi(ADCSRA, 0);
+  // combine the two bytes
+  u_sensor = (hi << 7) | (lo >> 1);
+  // manage negative values
+  if (u_sensor <= (CHANNELS / 2) - 1 ) {
+    u_sensor += (CHANNELS / 2);
+  } else {
+    u_sensor -= (CHANNELS / 2);
+  }
+  base_offset = u_sensor;
 }
 
 
 void loop()
 {
-  uint8_t lo, hi;
-  uint16_t u_sensor, maximum;
   uint16_t buffer[CHANNELS];
-  uint16_t offset, old_offset = 0;
   uint32_t flux;
 
   uint32_t flux_long = 0;
 
-  for(int i=0; i<(GPSdelay); i++)  // measurements between GPS aquisition
+  for(int n=0; n<(GPSdelay); n++)  // measurements between GPS aquisition
   {
-    for(int n=0; n<CHANNELS; n++)
+    digitalWrite(SYNC, HIGH);  
+
+    for(int i=0; i<CHANNELS; i++)
     {
-      buffer[n]=0;
+      buffer[i]=0;
     }
   
     // measurement of ADC offset
@@ -262,8 +295,7 @@ void loop()
     u_sensor = (hi << 7) | (lo >> 1);
     // manage negative values
     if (u_sensor <= (CHANNELS/2)-1 ) {u_sensor += (CHANNELS/2);} else {u_sensor -= (CHANNELS/2);}
-    if (1 < abs(old_offset - u_sensor)) offset = u_sensor;
-    old_offset = offset;
+    offset = u_sensor;
     
     PORTB = 1;                          // Set reset output for peak detector to H
     sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
@@ -330,8 +362,10 @@ void loop()
         buffer[maximum]++;
         maximum = 0;
       }
+    if ((GPSdelay - 1) == n) digitalWrite(SYNC2, HIGH);  
     }  
-    
+    digitalWrite(SYNC, LOW);  
+
     // Data out
     flux = 0;
     {
@@ -341,7 +375,7 @@ void loop()
       String dataString = "";
   
       // make a string for assembling the data to log:
-      dataString += "$CANDY,";
+      dataString += "$CANDYG,";
   
       dataString += String(count); 
       dataString += ",";
@@ -349,10 +383,10 @@ void loop()
       dataString += String(now.unixtime()); 
       dataString += ",";
   
-      uint16_t noise = offset+3; // first channel for flux calculation
+      uint16_t noise = base_offset+4; // first channel for flux calculation
       #define RANGE 252
       
-      for(int n=offset; n<(offset+RANGE); n++)  
+      for(int n=base_offset; n<(base_offset+RANGE); n++)  
       {
         dataString += String(buffer[n]); 
         //dataString += "\t";
@@ -360,7 +394,7 @@ void loop()
         //if (n==NOISE) dataString += "*,";
       }
       
-      for(int n=noise; n<(offset+RANGE); n++)  
+      for(int n=noise; n<(base_offset+RANGE); n++)  
       {
         flux += buffer[n]; 
       }
@@ -418,13 +452,12 @@ void loop()
 
       digitalWrite(LED_red, HIGH);  // Blink for Dasa
       Serial.println(dataString);   // print to terminal (additional 700 ms in DEBUG mode)
-      digitalWrite(LED_red, LOW);                
+      digitalWrite(LED_red, LOW); 
     }    
   }
   
   // GPS **********************
-  if (flux_long>TRESHOLD)
-//  if (false)
+//  if (flux_long>TRESHOLD)
   {
       // make a string for assembling the data to log:
       String dataString = "";
@@ -443,6 +476,7 @@ void loop()
       const char cmd[0x24 + 8]={0xB5, 0x62 ,0x06 ,0x24 ,0x24 ,0x00 ,0xFF ,0xFF ,0x07 ,0x03 ,0x00 ,0x00 ,0x00 ,0x00 ,0x10 ,0x27 , 0x00 ,0x00 ,0x05 ,0x00 ,0xFA ,0x00 ,0xFA ,0x00 ,0x64 ,0x00 ,0x5E ,0x01 ,0x00 ,0x3C ,0x00 ,0x00 , 0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x85 ,0x2A};
       for (int n=0;n<(0x24 + 8);n++) Serial.write(cmd[n]); 
     }
+      
     // flush serial buffer
     while (Serial.available()) Serial.read();
 
@@ -462,10 +496,10 @@ void loop()
         if (incomingByte == '$') {messages++;}; // Prevent endless waiting
         if (messages > 300) break; // more than 26 s
 
-        if (flag && (incomingByte == '*')) break;
+        if (flag && (incomingByte == '*')) break; // Waiting for FIX ("A*")
         flag = false;
 
-        if (incomingByte == 'A') flag = true;   // Waiting for FIX
+        if (incomingByte == 'A') flag = true;   // Waiting for FIX ("A")
       }
       else
       {
@@ -500,6 +534,7 @@ void loop()
         if (nomessages > GPSerror) break; // preventing of forever waiting
       }
     }
+    digitalWrite(SYNC2, LOW);  
     digitalWrite(GPSpower, LOW); // GPS Power OFF
 
     {
