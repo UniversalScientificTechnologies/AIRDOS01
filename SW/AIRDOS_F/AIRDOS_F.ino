@@ -1,5 +1,5 @@
 #define NODEBUG // Please comment it in debug mode
-String githash = "$Id$";
+String githash = "a21e0b7";
 /*
   AIRDOS with RTC (AIRDOS-F)
  
@@ -158,7 +158,7 @@ void setup()
   Serial.println("#Hmmm...");
 
   // make a string for device identification output
-  String dataString = "$AIRDOS,F," + githash.substring(5,12) + ","; // FW version and Git hash
+  String dataString = "$AIRDOS,F," + githash + ","; // FW version and Git hash
   
   Wire.beginTransmission(0x58);                   // request SN from EEPROM
   Wire.write((int)0x08); // MSB
