@@ -1,4 +1,4 @@
-//#define NODEBUG // Please comment it in debug mode
+#define NODEBUG // Please comment it in debug mode
 String githash = "$Id$";
 /*
   AIRDOS with RTC (AIRDOS-F)
@@ -59,7 +59,7 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
 #include <SD.h>             // Tested with version 1.2.2.
 #include "wiring_private.h"
 #include <Wire.h>           // Tested with version 1.0.0.
-#include "RTClib.h"         // Tested with version 1.5.4.
+#include "src/RTCx/RTCx.h"  // Modifyed version
 
 #define LED_yellow  23 // PC7
 #define RESET     0    // PB0
@@ -76,8 +76,7 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
 
 uint16_t count = 0;
 uint32_t serialhash = 0;
-
-RTC_Millis rtc;
+struct RTCx::tm tm;
 
 // Read Analog Differential without gain (read datashet of ATMega1280 and ATMega2560 for refference)
 // Use analogReadDiff(NUM)
@@ -159,7 +158,7 @@ void setup()
   Serial.println("#Hmmm...");
 
   // make a string for device identification output
-  String dataString = "$AIRDOS,F," + githash.substring(5,45) + ","; // FW version and Git hash
+  String dataString = "$AIRDOS,F," + githash.substring(5,12) + ","; // FW version and Git hash
   
   Wire.beginTransmission(0x58);                   // request SN from EEPROM
   Wire.write((int)0x08); // MSB
@@ -211,6 +210,9 @@ void setup()
     PORTB = 0b00000001;  // SDcard Power OFF          
   }    
 
+  // Initiate RTC
+  rtc.autoprobe();
+  rtc.resetClock();
 }
 
 
@@ -322,7 +324,8 @@ void loop()
   
   // Data out
   {
-    DateTime now = rtc.now();
+    rtc.readClock(tm);
+    RTCx::time_t t = RTCx::mktime(&tm);
 
     // make a string for assembling the data to log:
     String dataString = "";
@@ -333,7 +336,7 @@ void loop()
     dataString += String(count); 
     dataString += ",";
   
-    dataString += String(now.unixtime()); 
+    dataString += String(t-946684800); 
     dataString += ",";
 
     uint16_t noise = offset+3;

@@ -1,5 +1,5 @@
 #define DEBUG // Please comment it if you are not debugging
-String githash = "$Id: 2a1c18d43c3937e40a3beb6c2855589b2d1a19e9 $";
+String githash = "$Id$";
 /*
   AIRDOS02A (RTC, GPS)
  

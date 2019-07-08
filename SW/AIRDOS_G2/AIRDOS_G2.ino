@@ -1,5 +1,5 @@
 //#define DEBUG // Please comment it if you are not debugging
-String githash = "$Id: 2a1c18d43c3937e40a3beb6c2855589b2d1a19e9 $";
+String githash = "$Id$";
 /*
   AIRDOS02A (RTC, GPS) for tandem with AIRDOS C
  
@@ -462,7 +462,7 @@ void loop()
       // make a string for assembling the data to log:
       String dataString = "";
 
-#define MSG_NO 10    // number of logged NMEA messages
+#define MSG_NO 20    // number of logged NMEA messages
 
     digitalWrite(GPSpower, HIGH); // GPS Power ON
     delay(100);
@@ -522,7 +522,12 @@ void loop()
         incomingByte = Serial.read();
         nomessages = 0;
         
-        if (incomingByte == '$') {flag = true; messages++;};
+        if (incomingByte == '$') 
+        {
+          flag = true; 
+          messages++;
+        }
+        
         if (messages > MSG_NO) break;
         
         // say what you got:
@@ -538,38 +543,38 @@ void loop()
     digitalWrite(GPSpower, LOW); // GPS Power OFF
 
     {
-        DDRB = 0b10111110;
-        PORTB = 0b00001111;  // SDcard Power ON
-        
-        // make sure that the default chip select pin is set to output
-        // see if the card is present and can be initialized:
-        if (!SD.begin(SS)) 
-        {
-          Serial.println("#Card failed, or not present");
-          // don't do anything more:
-          return;
-        }
-        
-        // open the file. note that only one file can be open at a time,
-        // so you have to close this one before opening another.
-        File dataFile = SD.open("datalog.txt", FILE_WRITE);
-        
-        // if the file is available, write to it:
-        if (dataFile) 
-        {
-          digitalWrite(LED_red, HIGH);  // Blink for Dasa
-          dataFile.print(dataString);  // write to SDcard (800 ms)     
-          digitalWrite(LED_red, LOW);          
-          dataFile.close();
-        }  
-        // if the file isn't open, pop up an error:
-        else 
-        {
-          Serial.println("#error opening datalog.txt");
-        }
-        
-        DDRB = 0b10011110;
-        PORTB = 0b00000001;  // SDcard Power OFF
+      DDRB = 0b10111110;
+      PORTB = 0b00001111;  // SDcard Power ON
+      
+      // make sure that the default chip select pin is set to output
+      // see if the card is present and can be initialized:
+      if (!SD.begin(SS)) 
+      {
+        Serial.println("#Card failed, or not present");
+        // don't do anything more:
+        return;
+      }
+      
+      // open the file. note that only one file can be open at a time,
+      // so you have to close this one before opening another.
+      File dataFile = SD.open("datalog.txt", FILE_WRITE);
+      
+      // if the file is available, write to it:
+      if (dataFile) 
+      {
+        digitalWrite(LED_red, HIGH);  // Blink for Dasa
+        dataFile.print(dataString);  // write to SDcard (800 ms)     
+        digitalWrite(LED_red, LOW);          
+        dataFile.close();
+      }  
+      // if the file isn't open, pop up an error:
+      else 
+      {
+        Serial.println("#error opening datalog.txt");
+      }
+      
+      DDRB = 0b10011110;
+      PORTB = 0b00000001;  // SDcard Power OFF
     }  
 #ifdef DEBUG
     Serial.print(dataString);  // print to terminal (additional 700 ms)
