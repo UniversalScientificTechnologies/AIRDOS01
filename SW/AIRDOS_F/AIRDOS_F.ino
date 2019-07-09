@@ -1,5 +1,5 @@
 #define NODEBUG // Please comment it in debug mode
-String githash = "a21e0b7";
+String githash = "5bc7e06";
 /*
   AIRDOS with RTC (AIRDOS-F)
  
@@ -76,6 +76,9 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
 
 uint16_t count = 0;
 uint32_t serialhash = 0;
+uint16_t offset, base_offset;
+uint8_t lo, hi;
+uint16_t u_sensor, maximum;
 struct RTCx::tm tm;
 
 // Read Analog Differential without gain (read datashet of ATMega1280 and ATMega2560 for refference)
@@ -210,6 +213,37 @@ void setup()
     PORTB = 0b00000001;  // SDcard Power OFF          
   }    
 
+  // measurement of ADC offset
+  ADMUX = (analog_reference << 6) | 0b10001; // Select +A1,-A1 for offset correction
+  delay(200);
+  ADCSRB = 0;               // Switching ADC to Free Running mode
+  sbi(ADCSRA, ADATE);       // ADC autotrigger enable (mandatory for free running mode)
+  sbi(ADCSRA, ADSC);        // ADC start the first conversions
+  sbi(ADCSRA, 2);           // 0x100 = clock divided by 16, 62.5 kHz, 208 us for 13 cycles of one AD conversion, 24 us fo 1.5 cycle for sample-hold
+  cbi(ADCSRA, 1);
+  cbi(ADCSRA, 0);
+  sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
+  while (bit_is_clear(ADCSRA, ADIF)); // wait for the first conversion
+  sbi(ADCSRA, ADIF);                  // reset interrupt flag from ADC
+  lo = ADCL;
+  hi = ADCH;
+  ADMUX = (analog_reference << 6) | 0b10000; // Select +A0,-A1 for measurement
+  ADCSRB = 0;               // Switching ADC to Free Running mode
+  sbi(ADCSRA, ADATE);       // ADC autotrigger enable (mandatory for free running mode)
+  sbi(ADCSRA, ADSC);        // ADC start the first conversions
+  sbi(ADCSRA, 2);           // 0x100 = clock divided by 16, 62.5 kHz, 208 us for 13 cycles of one AD conversion, 24 us fo 1.5 cycle for sample-hold
+  cbi(ADCSRA, 1);
+  cbi(ADCSRA, 0);
+  // combine the two bytes
+  u_sensor = (hi << 7) | (lo >> 1);
+  // manage negative values
+  if (u_sensor <= (CHANNELS / 2) - 1 ) {
+    u_sensor += (CHANNELS / 2);
+  } else {
+    u_sensor -= (CHANNELS / 2);
+  }
+  base_offset = u_sensor;
+
   // Initiate RTC
   rtc.autoprobe();
   rtc.resetClock();
@@ -218,10 +252,7 @@ void setup()
 
 void loop()
 {
-  uint8_t lo, hi;
-  uint16_t u_sensor, maximum;
   uint16_t buffer[CHANNELS];
-  uint16_t offset;
   
   for(int n=0; n<CHANNELS; n++)
   {
@@ -339,11 +370,11 @@ void loop()
     dataString += String(t-946684800); 
     dataString += ",";
 
-    uint16_t noise = offset+3;
+    uint16_t noise = base_offset+3;
     uint32_t dose=0;
     #define RANGE 252
     
-    for(int n=offset; n<(offset+RANGE); n++)  
+    for(int n=base_offset; n<(base_offset+RANGE); n++)  
     {
       dataString += String(buffer[n]); 
       //dataString += "\t";
@@ -351,7 +382,7 @@ void loop()
       //if (n==NOISE) dataString += "*,";
     }
     
-    for(int n=noise; n<(offset+RANGE); n++)  
+    for(int n=noise; n<(base_offset+RANGE); n++)  
     {
       dose += buffer[n]; 
     }
