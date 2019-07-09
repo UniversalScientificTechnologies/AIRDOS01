@@ -1,5 +1,5 @@
 //#define DEBUG // Please comment it if you are not debugging
-String githash = "$Id$";
+String githash = "568fc84";
 /*
   AIRDOS02A (RTC, GPS)
  
@@ -59,9 +59,9 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
 #include <SD.h>             // Tested with version 1.0.7. (MightyCore)
 #include "wiring_private.h"
 #include <Wire.h>           // Tested with version 1.0.0.
-#include "RTClib.h"         // Tested with version 1.5.4. (NeiroN)
+#include "src/RTCx/RTCx.h"  // Modified version
 
-#define LED_red  23 // PC7
+#define LED_red   23   // PC7
 #define RESET     0    // PB0
 #define GPSpower  26   // PA2
 #define SDpower1  1    // PB1
@@ -83,8 +83,7 @@ uint32_t serialhash = 0;
 uint16_t offset, base_offset;
 uint8_t lo, hi;
 uint16_t u_sensor, maximum;
-
-RTC_Millis rtc;
+struct RTCx::tm tm;
 
 // Read Analog Differential without gain (read datashet of ATMega1280 and ATMega2560 for refference)
 // Use analogReadDiff(NUM)
@@ -166,7 +165,7 @@ void setup()
   Serial.println("#Hmmm...");
 
   // make a string for device identification output
-  String dataString = "$AIRDOS,G," + githash.substring(5,45) + ","; // FW version and Git hash
+  String dataString = "$AIRDOS,G," + githash + ","; // FW version and Git hash
   
   Wire.beginTransmission(0x58);                   // request SN from EEPROM
   Wire.write((int)0x08); // MSB
@@ -248,6 +247,10 @@ void setup()
     u_sensor -= (CHANNELS / 2);
   }
   base_offset = u_sensor;
+
+  // Initiates RTC
+  rtc.autoprobe();
+  rtc.resetClock();
 }
 
 
@@ -362,7 +365,8 @@ void loop()
     // Data out
     flux = 0;
     {
-      DateTime now = rtc.now();
+      rtc.readClock(tm);
+      RTCx::time_t t = RTCx::mktime(&tm);
   
       // make a string for assembling the data to log:
       String dataString = "";
@@ -373,7 +377,7 @@ void loop()
       dataString += String(count); 
       dataString += ",";
     
-      dataString += String(now.unixtime()); 
+      dataString += String(t-946684800); 
       dataString += ",";
   
       uint16_t noise = base_offset+4; // first channel for flux calculation
@@ -401,7 +405,7 @@ void loop()
       count++;
 
       flux_long = flux_long + flux;
-         
+    
      //if (flux>TRESHOLD)
      {
         DDRB = 0b10111110;

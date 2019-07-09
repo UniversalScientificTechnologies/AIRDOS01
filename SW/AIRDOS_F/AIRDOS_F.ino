@@ -1,5 +1,5 @@
-#define NODEBUG // Please comment it in debug mode
-String githash = "5bc7e06";
+//#define DEBUG // Please comment it if you are not debugging
+String githash = "568fc84";
 /*
   AIRDOS with RTC (AIRDOS-F)
  
@@ -59,18 +59,18 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
 #include <SD.h>             // Tested with version 1.2.2.
 #include "wiring_private.h"
 #include <Wire.h>           // Tested with version 1.0.0.
-#include "src/RTCx/RTCx.h"  // Modifyed version
+#include "src/RTCx/RTCx.h"  // Modified version
 
-#define LED_yellow  23 // PC7
-#define RESET     0    // PB0
-#define SDpower1  1    // PB1
-#define SDpower2  2    // PB2
-#define SDpower3  3    // PB3
-#define SS        4    // PB4
-#define MOSI      5    // PB5
-#define MISO      6    // PB6
-#define SCK       7    // PB7
-#define INT       20   // PC4
+#define LED_yellow  23   // PC7
+#define RESET       0    // PB0
+#define SDpower1    1    // PB1
+#define SDpower2    2    // PB2
+#define SDpower3    3    // PB3
+#define SS          4    // PB4
+#define MOSI        5    // PB5
+#define MISO        6    // PB6
+#define SCK         7    // PB7
+#define INT         20   // PC4
 
 #define CHANNELS 512 // number of channels in buffer for histogram, including negative numbers
 
@@ -244,7 +244,7 @@ void setup()
   }
   base_offset = u_sensor;
 
-  // Initiate RTC
+  // Initiates RTC
   rtc.autoprobe();
   rtc.resetClock();
 }
@@ -429,7 +429,8 @@ void loop()
       DDRB = 0b10011110;
       PORTB = 0b00000001;  // SDcard Power OFF
 
-#ifdef NODEBUG
+#ifdef DEBUG
+#else
       dataString.remove(75); 
 #endif
       digitalWrite(LED_yellow, HIGH);  // Blink for Dasa
