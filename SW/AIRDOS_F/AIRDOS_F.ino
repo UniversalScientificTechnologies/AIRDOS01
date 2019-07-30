@@ -1,10 +1,10 @@
 //#define DEBUG // Please comment it if you are not debugging
-String githash = "568fc84";
+String githash = "d2d1e0d";
+String FWversion = "F2";
+
 /*
   AIRDOS with RTC (AIRDOS-F)
  
-Compiled with: Arduino 1.8.5
-
 3 month endurance with LS 33600 = 7.6 mA
 
 ISP
@@ -56,10 +56,19 @@ TX1/INT1 (D 11) PD3 17|        |24 PC2 (D 18) TCK
                       +--------+
 */
 
-#include <SD.h>             // Tested with version 1.2.2.
+/*
+// Compiled with: Arduino 1.8.9
+// MightyCore 2.0.2 https://mcudude.github.io/MightyCore/package_MCUdude_MightyCore_index.json
+Fix old bug in Mighty SD library
+~/.arduino15/packages/MightyCore/hardware/avr/2.0.2/libraries/SD/src/SD.cpp:
+boolean SDClass::begin(uint32_t clock, uint8_t csPin) {
+  if(root.isOpen()) root.close();
+*/
+
+#include <SD.h>             // Revised version from MightyCore
 #include "wiring_private.h"
-#include <Wire.h>           // Tested with version 1.0.0.
-#include "src/RTCx/RTCx.h"  // Modified version
+#include <Wire.h>           
+#include "src/RTCx/RTCx.h"  // Modified version included
 
 #define LED_yellow  23   // PC7
 #define RESET       0    // PB0
@@ -108,10 +117,6 @@ void setup()
 
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  while (!Serial) 
-  {
-  ; // wait for serial port to connect. Needed for Leonardo only?
-  }
 
   Serial.println("#Cvak...");
   
@@ -161,7 +166,7 @@ void setup()
   Serial.println("#Hmmm...");
 
   // make a string for device identification output
-  String dataString = "$AIRDOS,F," + githash + ","; // FW version and Git hash
+  String dataString = "$AIRDOS," + FWversion + "," + githash + ","; // FW version and Git hash
   
   Wire.beginTransmission(0x58);                   // request SN from EEPROM
   Wire.write((int)0x08); // MSB
@@ -439,12 +444,3 @@ void loop()
     }          
   }    
 }
-
-
-
-
-
-
-
-
-
