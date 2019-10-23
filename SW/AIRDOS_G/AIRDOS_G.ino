@@ -1,6 +1,7 @@
-//#define DEBUG // Please comment it if you are not debugging
+#define DEBUG // Please comment it if you are not debugging
 String githash = "d2d1e0d";
-String FWversion = "G2";
+String FWversion = "G3";
+
 /*
   AIRDOS02A (RTC, GPS)
  
@@ -83,8 +84,8 @@ boolean SDClass::begin(uint32_t clock, uint8_t csPin) {
 
 #define CHANNELS 512   // number of channels in buffer for histogram, including negative numbers
 #define GPSerror 70000 // number of cycles for waitig for GPS in case of GPS error 
-#define GPSdelay 50    // number of measurements between obtaining GPS position
-#define TRESHOLD 3*GPSdelay  // ionising radiation flux treshold for obtaining GPS position
+#define GPSdelay 5    // number of measurements between obtaining GPS position
+#define GPSthreshold 3*GPSdelay  // ionising radiation flux threshold for obtaining GPS position
 
 uint16_t count = 0;
 uint32_t serialhash = 0;
@@ -251,7 +252,7 @@ void setup()
   } else {
     u_sensor -= (CHANNELS / 2);
   }
-  base_offset = u_sensor;
+  base_offset = 256; //u_sensor;
 
   // Initiates RTC
   rtc.autoprobe();
@@ -411,7 +412,7 @@ void loop()
 
       flux_long = flux_long + flux;
     
-     //if (flux>TRESHOLD)
+     //if (flux > GPSthreshold)
      {
         DDRB = 0b10111110;
         PORTB = 0b00001111;  // SDcard Power ON
@@ -459,7 +460,7 @@ void loop()
   }
   
   // GPS **********************
-  if (flux_long>TRESHOLD)
+  if (flux_long > GPSthreshold)
 //  if (false)
   {
       // make a string for assembling the data to log:
