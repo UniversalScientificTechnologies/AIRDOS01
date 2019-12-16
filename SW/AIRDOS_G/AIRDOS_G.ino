@@ -262,7 +262,7 @@ void setup()
 
 void loop()
 {
-  uint16_t buffer[CHANNELS];
+  uint16_t histogram[CHANNELS];
   uint32_t flux;
 
   uint32_t flux_long = 0;
@@ -271,7 +271,7 @@ void loop()
   {
     for(int n=0; n<CHANNELS; n++)
     {
-      buffer[n]=0;
+      histogram[n]=0;
     }
   
     // measurement of ADC offset
@@ -363,7 +363,7 @@ void loop()
       }
       else
       {
-        buffer[maximum]++;
+        histogram[maximum]++;
         maximum = 0;
       }
     }  
@@ -391,7 +391,7 @@ void loop()
       
       for(int n=base_offset; n<(base_offset+RANGE); n++)  
       {
-        dataString += String(buffer[n]); 
+        dataString += String(histogram[n]); 
         //dataString += "\t";
         dataString += ",";
         //if (n==NOISE) dataString += "*,";
@@ -399,7 +399,7 @@ void loop()
       
       for(int n=noise; n<(base_offset+RANGE); n++)  
       {
-        flux += buffer[n]; 
+        flux += histogram[n]; 
       }
   
       dataString += String(suppress);
