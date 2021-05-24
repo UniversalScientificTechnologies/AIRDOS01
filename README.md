@@ -14,6 +14,7 @@ Technical parameters are following:
 * Energy measurement resolution    <30 keV/channel
 * GPS logging interval    5 minutes
 * Time to GPS fix	26 s
+* Airborne GPS parameters (Navigation altitude verified up to 36km amsl)
 * Integration time    8 s
 * Weight 1.225 kg (Without batteries and GPS antenna)
 
