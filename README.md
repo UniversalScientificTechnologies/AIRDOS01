@@ -24,4 +24,4 @@ Device block diagram
 CANDY detector schematics
 ![AIRDOS01A back panel](/SCH_PCB/CANDY/CANDY01A/CANDY_Detector_Schematics.png)
 
-The device can be [purchased from Universal Scientific Technologies s.r.o](http://www.ust.cz/shop/product_info.php?&products_id=269) online store. 
+The device is replaced with updated version [AIRDOS02](https://github.com/UniversalScientificTechnologies/AIRDOS02). 
